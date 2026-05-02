@@ -99,6 +99,14 @@ const TOOLS = [
     status: "wip",
     url: null,
   },
+  {
+  id: "guia-accesibilidad",
+  name: { es: "Guía de pruebas de accesibilidad", en: "Accessibility testing guide" },
+  desc: { es: "55 pruebas WCAG 2.2 AA organizadas por metodología: teclado, visual, lector de pantalla y más.", en: "55 WCAG 2.2 AA tests organised by methodology: keyboard, visual, screen reader and more." },
+  tags: ["a11y"],
+  status: "live",
+  url: "/guia-pruebas-accesibilidad.html",
+},
 ];
 
 const TAG_META = {
