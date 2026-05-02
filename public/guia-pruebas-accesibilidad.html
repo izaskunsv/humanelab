@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Validación de Accesibilidad · WCAG 2.2 AA</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
+
+  /*
+   * Contraste verificado (todos ≥ 7:1 AAA excepto donde se indica):
+   * #1a1a1a / #ffffff  = 17.4:1  AAA
+   * #1a1a1a / #f5f5f5  = 16.0:1  AAA
+   * #1a1a1a / #ededed  = 14.5:1  AAA
+   * #374151 / #ffffff  = 10.3:1  AAA
+   * #374151 / #f5f5f5  =  9.5:1  AAA
+   * #4b5563 / #ffffff  =  7.6:1  AAA
+   * #4b5563 / #f5f5f5  =  6.9:1  AA
+   * #1e3a8a / #dbeafe  =  8.5:1  AAA
+   * #4c1d95 / #ede9fe  =  9.2:1  AAA
+   * #14532d / #dcfce7  =  8.3:1  AAA
+   * #7f1d1d / #fee2e2  =  8.2:1  AAA
+   */
+
+  :root {
+    --bg:             #f5f5f5;
+    --surface:        #ffffff;
+    --surface2:       #ededed;
+    --border:         #d4d4d4;
+    --border-strong:  #b0b0b0;
+    --text:           #1a1a1a;
+    --text-sec:       #374151;
+    --text-muted:     #4b5563;
+    --level-a:        #1e3a8a;
+    --level-a-bg:     #dbeafe;
+    --level-aa:       #4c1d95;
+    --level-aa-bg:    #ede9fe;
+    --pass:           #14532d;
+    --pass-bg:        #dcfce7;
+    --pass-border:    rgba(20,83,45,0.2);
+    --fail:           #7f1d1d;
+    --fail-bg:        #fee2e2;
+    --fail-border:    rgba(127,29,29,0.2);
+    --accent:         #e8f55a;
+    --sidebar-w:      280px;
+    --header-h:       56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .skip-link {
+    position: fixed; top: -100px; left: 16px; z-index: 9999;
+    background: #1a1a1a; color: #ffffff;
+    padding: 10px 20px; border-radius: 4px;
+    font-weight: 600; text-decoration: none; transition: top 0.2s;
+  }
+  .skip-link:focus { top: 8px; outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  header {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 24px; gap: 16px;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  }
+  .header-logo {
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-muted); white-space: nowrap;
+  }
+  .header-logo span {
+    color: var(--text); background: var(--accent);
+    padding: 1px 6px; border-radius: 3px;
+  }
+  .header-divider { width: 1px; height: 20px; background: var(--border); }
+  .header-title { font-size: 14px; color: var(--text-sec); }
+
+  .menu-toggle {
+    display: none; margin-left: auto;
+    background: none; border: 1px solid var(--border);
+    color: var(--text); padding: 6px 12px;
+    border-radius: 4px; cursor: pointer;
+    font-size: 14px; font-family: inherit;
+  }
+  .menu-toggle:focus-visible { outline: 2px solid var(--level-a); outline-offset: 2px; }
+
+  .layout { display: flex; margin-top: var(--header-h); min-height: calc(100vh - var(--header-h)); }
+
+  nav[aria-label="Secciones"] {
+    position: fixed; top: var(--header-h); left: 0;
+    width: var(--sidebar-w); height: calc(100vh - var(--header-h));
+    background: var(--surface); border-right: 1px solid var(--border);
+    overflow-y: auto; padding: 20px 0; z-index: 90;
+  }
+  nav[aria-label="Secciones"]::-webkit-scrollbar { width: 4px; }
+  nav[aria-label="Secciones"]::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+
+  .nav-section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-muted);
+    padding: 0 20px 6px; margin-top: 18px;
+  }
+  .nav-section-label:first-child { margin-top: 0; }
+
+  .nav-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 20px; font-size: 14px; color: var(--text-sec);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: color 0.1s, background 0.1s, border-color 0.1s;
+    cursor: pointer; background: none;
+    border-top: none; border-right: none; border-bottom: none;
+    width: 100%; text-align: left; font-family: inherit; line-height: 1.4;
+  }
+  .nav-link:hover { color: var(--text); background: var(--surface2); }
+  .nav-link:focus-visible { outline: 2px solid var(--level-a); outline-offset: -2px; }
+  .nav-link.active {
+    color: var(--level-a); background: var(--level-a-bg);
+    border-left-color: var(--level-a); font-weight: 600;
+  }
+
+  .nav-emoji { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+  .nav-count {
+    margin-left: auto; font-size: 11px; font-weight: 500;
+    color: var(--text-sec); background: var(--surface2);
+    border: 1px solid var(--border); padding: 1px 7px; border-radius: 10px; flex-shrink: 0;
+  }
+  .nav-link.active .nav-count {
+    background: var(--level-a-bg); color: var(--level-a);
+    border-color: rgba(30,58,138,0.25);
+  }
+
+  main {
+    margin-left: var(--sidebar-w); flex: 1;
+    padding: 40px 48px; max-width: 960px;
+  }
+  main:focus { outline: none; }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .page-header {
+    margin-bottom: 36px; padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-eyebrow {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 8px; font-weight: 700;
+  }
+  h1 { font-size: 28px; font-weight: 600; line-height: 1.2; color: var(--text); margin-bottom: 12px; }
+  .page-desc { font-size: 16px; color: var(--text-sec); line-height: 1.6; max-width: 640px; }
+
+  h2 {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 14px; margin-top: 36px;
+  }
+  h2:first-of-type { margin-top: 0; }
+
+  /* Test cards */
+  .tests-list { display: flex; flex-direction: column; gap: 4px; }
+
+  .test-card {
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); overflow: hidden; transition: border-color 0.1s, box-shadow 0.1s;
+  }
+  .test-card:hover { border-color: var(--border-strong); box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+
+  .test-summary {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; cursor: pointer; list-style: none;
+    transition: background 0.1s;
+  }
+  .test-summary:hover { background: var(--bg); }
+  .test-summary::-webkit-details-marker { display: none; }
+  .test-summary:focus-visible { outline: 2px solid var(--level-a); outline-offset: -2px; }
+
+  .test-id { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); min-width: 44px; flex-shrink: 0; }
+  .test-title-group { flex: 1; min-width: 0; }
+  .test-name { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.3; }
+  .test-pauta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .test-meta { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.03em; }
+  .badge-a  { background: var(--level-a-bg);  color: var(--level-a);  border: 1px solid rgba(30,58,138,0.2); }
+  .badge-aa { background: var(--level-aa-bg); color: var(--level-aa); border: 1px solid rgba(76,29,149,0.2); }
+  .badge-rol {
+    font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px;
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text-sec);
+  }
+  .test-chevron { color: var(--text-muted); font-size: 11px; flex-shrink: 0; transition: transform 0.2s; }
+  details[open] .test-chevron { transform: rotate(90deg); }
+
+  .test-body { padding: 0 18px 18px; border-top: 1px solid var(--border); }
+  .test-method-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 0 14px; border-bottom: 1px solid var(--border); margin-bottom: 16px;
+  }
+  .method-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700; }
+  .method-value {
+    font-size: 13px; color: var(--text-sec); background: var(--surface2);
+    border: 1px solid var(--border); padding: 2px 10px; border-radius: 4px; font-weight: 500;
+  }
+
+  .test-sections { display: grid; gap: 10px; }
+  .test-section-block {
+    background: var(--bg); border-radius: 6px;
+    padding: 14px 16px; border: 1px solid var(--border);
+  }
+  .test-section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .label-icon { font-style: normal; font-size: 13px; flex-shrink: 0; }
+  .label-como  { color: var(--text-muted); }
+  .label-pasa  { color: var(--pass); }
+  .label-falla { color: var(--fail); }
+
+  .test-section-block.pasa-block  { border-color: var(--pass-border); background: var(--pass-bg); }
+  .test-section-block.falla-block { border-color: var(--fail-border); background: var(--fail-bg); }
+  .test-text { font-size: 15px; color: var(--text-sec); line-height: 1.7; white-space: pre-line; }
+  .pasa-block .test-text, .falla-block .test-text { color: var(--text); }
+
+  /* Home */
+  .home-tagline { font-size: 18px; color: var(--text-sec); line-height: 1.5; max-width: 560px; margin-bottom: 20px; }
+  .home-stats { display: flex; gap: 32px; flex-wrap: wrap; margin-top: 20px; }
+  .stat-item { display: flex; flex-direction: column; gap: 4px; }
+  .stat-number { font-size: 32px; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat-label { font-size: 13px; color: var(--text-muted); }
+
+  .home-sections { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 8px; }
+  .home-section-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 18px 18px 16px; cursor: pointer; text-align: left;
+    font-family: inherit; color: var(--text);
+    transition: border-color 0.1s, background 0.1s, box-shadow 0.1s; width: 100%;
+  }
+  .home-section-card:hover {
+    border-color: rgba(30,58,138,0.35); background: var(--level-a-bg);
+    box-shadow: 0 2px 8px rgba(30,58,138,0.08);
+  }
+  .home-section-card:focus-visible { outline: 2px solid var(--level-a); outline-offset: 2px; }
+  .hsc-emoji { font-size: 22px; margin-bottom: 10px; display: block; }
+  .hsc-name  { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  .hsc-desc  { font-size: 13px; color: var(--text-sec); line-height: 1.5; margin-bottom: 10px; }
+  .hsc-count { font-size: 12px; color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 5px; }
+  .hsc-count::before { content: '▸'; font-size: 10px; }
+
+  /* Resources */
+  .resources-list { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .resource-link {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    text-decoration: none; color: var(--text);
+    transition: border-color 0.1s, background 0.1s, box-shadow 0.1s;
+  }
+  .resource-link:hover {
+    border-color: rgba(30,58,138,0.35); background: var(--level-a-bg);
+    box-shadow: 0 2px 8px rgba(30,58,138,0.08);
+  }
+  .resource-link:focus-visible { outline: 2px solid var(--level-a); outline-offset: 2px; border-radius: 8px; }
+  .resource-icon {
+    font-size: 20px; flex-shrink: 0; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--level-a-bg); border-radius: 6px;
+    border: 1px solid rgba(30,58,138,0.15);
+  }
+  .resource-body { flex: 1; min-width: 0; }
+  .resource-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .resource-desc  { font-size: 13px; color: var(--text-sec); line-height: 1.5; }
+  .resource-url   {
+    font-size: 12px; font-family: 'DM Mono', monospace;
+    color: var(--level-a); margin-top: 6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .resource-arrow {
+    font-size: 14px; color: var(--text-muted); flex-shrink: 0; margin-top: 2px;
+  }
+
+  /* Tools */
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .tool-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+    transition: border-color 0.1s, box-shadow 0.1s;
+  }
+  .tool-card:hover { border-color: var(--border-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .tool-header { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); background: var(--bg); }
+  .tool-name { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .tool-type-row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+  .tool-type-badge {
+    font-size: 11px; font-weight: 500; padding: 2px 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--text-sec);
+  }
+  .tool-free {
+    font-size: 11px; font-weight: 600; padding: 2px 8px;
+    background: var(--pass-bg); border: 1px solid var(--pass-border);
+    border-radius: 4px; color: var(--pass);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .tool-free::before { content: '✓'; font-size: 11px; }
+  .tool-body { padding: 14px 16px; }
+  .tool-desc { font-size: 14px; color: var(--text-sec); line-height: 1.55; white-space: pre-line; margin-bottom: 10px; }
+  .tool-nav-row { font-size: 12px; color: var(--text-muted); margin-bottom: 7px; line-height: 1.5; }
+  .tool-nav-row strong { color: var(--text-sec); font-weight: 600; }
+  .tool-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; color: var(--level-a);
+    text-decoration: underline; text-underline-offset: 2px;
+    transition: color 0.1s; font-family: 'DM Mono', monospace; word-break: break-all;
+  }
+  .tool-link:hover { color: var(--text); }
+  .tool-link:focus-visible { outline: 2px solid var(--level-a); outline-offset: 2px; border-radius: 2px; }
+  .tool-criterios {
+    font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-muted);
+    margin-top: 10px; line-height: 1.6; padding-top: 8px; border-top: 1px solid var(--border);
+  }
+  .tool-details-toggle {
+    width: 100%; background: var(--bg); border: none; border-top: 1px solid var(--border);
+    padding: 10px 16px; text-align: left; font-size: 13px; font-weight: 500;
+    color: var(--text-sec); cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 8px; transition: background 0.1s, color 0.1s;
+  }
+  .tool-details-toggle:hover { background: var(--surface2); color: var(--text); }
+  .tool-details-toggle:focus-visible { outline: 2px solid var(--level-a); outline-offset: -2px; }
+  .tool-details-content { display: none; padding: 0 16px 14px; border-top: 1px solid var(--border); background: var(--surface); }
+  .tool-details-content.open { display: block; }
+  .tool-detail-section { margin-top: 14px; }
+  .tool-detail-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+  .tool-detail-text { font-size: 13px; color: var(--text-sec); white-space: pre-line; line-height: 1.6; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    :root { --sidebar-w: 0px; }
+    .menu-toggle { display: flex; }
+    nav[aria-label="Secciones"] {
+      transform: translateX(-280px); width: 280px;
+      transition: transform 0.25s ease;
+    }
+    nav[aria-label="Secciones"].open {
+      transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.12);
+    }
+    main { margin-left: 0; padding: 24px 20px; }
+    .tools-grid { grid-template-columns: 1fr; }
+  }
+  .nav-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.25); z-index: 89;
+  }
+  .nav-overlay.open { display: block; }
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Ir al contenido principal</a>
+
+<header role="banner">
+  <div class="header-logo"><span>WCAG</span> 2.2 AA</div>
+  <div class="header-divider" aria-hidden="true"></div>
+  <p class="header-title">Guía de Validación de Accesibilidad</p>
+  <button class="menu-toggle" aria-label="Abrir menú de navegación" aria-expanded="false" id="menu-toggle">☰ Menú</button>
+</header>
+
+<div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
+
+<div class="layout">
+  <nav aria-label="Secciones" id="sidebar">
+    <div class="nav-section-label">Inicio</div>
+    <button class="nav-link active" onclick="showPage('home')" aria-current="page" id="nav-home">
+      <span class="nav-emoji" aria-hidden="true">◎</span>Resumen general
+    </button>
+    <div class="nav-section-label">Pruebas por metodología</div>
+    <button class="nav-link" onclick="showPage('teclado')" id="nav-teclado">
+      <span class="nav-emoji" aria-hidden="true">🎹</span>Teclado
+      <span class="nav-count" aria-label="9 pruebas">9</span>
+    </button>
+    <button class="nav-link" onclick="showPage('visual')" id="nav-visual">
+      <span class="nav-emoji" aria-hidden="true">👁</span>Visual
+      <span class="nav-count" aria-label="12 pruebas">12</span>
+    </button>
+    <button class="nav-link" onclick="showPage('lector')" id="nav-lector">
+      <span class="nav-emoji" aria-hidden="true">🔊</span>Lector de pantalla
+      <span class="nav-count" aria-label="10 pruebas">10</span>
+    </button>
+    <button class="nav-link" onclick="showPage('formularios')" id="nav-formularios">
+      <span class="nav-emoji" aria-hidden="true">📝</span>Formularios
+      <span class="nav-count" aria-label="9 pruebas">9</span>
+    </button>
+    <button class="nav-link" onclick="showPage('multimedia')" id="nav-multimedia">
+      <span class="nav-emoji" aria-hidden="true">🎥</span>Multimedia
+      <span class="nav-count" aria-label="5 pruebas">5</span>
+    </button>
+    <button class="nav-link" onclick="showPage('contenido')" id="nav-contenido">
+      <span class="nav-emoji" aria-hidden="true">📐</span>Contenido
+      <span class="nav-count" aria-label="5 pruebas">5</span>
+    </button>
+    <button class="nav-link" onclick="showPage('tactil')" id="nav-tactil">
+      <span class="nav-emoji" aria-hidden="true">👆</span>Puntero y Táctil
+      <span class="nav-count" aria-label="5 pruebas">5</span>
+    </button>
+    <div class="nav-section-label">Recursos</div>
+    <button class="nav-link" onclick="showPage('herramientas')" id="nav-herramientas">
+      <span class="nav-emoji" aria-hidden="true">🛠</span>Herramientas
+      <span class="nav-count" aria-label="11 herramientas">11</span>
+    </button>
+    <button class="nav-link" onclick="showPage('referencias')" id="nav-referencias">
+      <span class="nav-emoji" aria-hidden="true">📚</span>Referencias
+    </button>
+  </nav>
+
+  <main id="main-content" tabindex="-1">
+
+    <!-- HOME -->
+    <section class="page active" id="page-home" aria-label="Inicio">
+      <div class="page-header">
+        <p class="page-eyebrow">Guía de Validación · WCAG 2.2 AA</p>
+        <h1>Validación de Accesibilidad Web</h1>
+        <p class="home-tagline">Consulta de pruebas organizadas por metodología para equipos de diseño y desarrollo.</p>
+        <div class="home-stats" role="list" aria-label="Estadísticas">
+          <div class="stat-item" role="listitem">
+            <span class="stat-number" aria-label="55 pruebas">55</span>
+            <span class="stat-label">Pruebas totales</span>
+          </div>
+          <div class="stat-item" role="listitem">
+            <span class="stat-number" aria-label="7 metodologías">7</span>
+            <span class="stat-label">Metodologías</span>
+          </div>
+          <div class="stat-item" role="listitem">
+            <span class="stat-number" aria-label="11 herramientas">11</span>
+            <span class="stat-label">Herramientas</span>
+          </div>
+        </div>
+      </div>
+      <h2 id="secciones-heading">Metodologías de prueba</h2>
+      <div class="home-sections" role="list" aria-labelledby="secciones-heading" id="home-cards"></div>
+    </section>
+
+    <!-- SECTION PAGES (generated by JS) -->
+    <div id="section-pages"></div>
+
+    <!-- HERRAMIENTAS -->
+    <section class="page" id="page-herramientas" aria-label="Herramientas">
+      <div class="page-header">
+        <p class="page-eyebrow">Recursos</p>
+        <h1>🛠 Herramientas de análisis</h1>
+        <p class="page-desc">Extensiones, bookmarklets, pruebas manuales y lectores de pantalla para realizar las pruebas de accesibilidad.</p>
+      </div>
+      <div class="tools-grid" id="tools-grid" role="list" aria-label="Herramientas disponibles"></div>
+    </section>
+
+    <!-- REFERENCIAS -->
+    <section class="page" id="page-referencias" aria-label="Referencias">
+      <div class="page-header">
+        <p class="page-eyebrow">Recursos</p>
+        <h1>📚 Referencias</h1>
+        <p class="page-desc">Documentación oficial y publicaciones de referencia para profundizar en accesibilidad web y WCAG 2.2.</p>
+      </div>
+      <div class="resources-list" role="list" aria-label="Referencias recomendadas">
+
+        <a class="resource-link" role="listitem"
+           href="https://www.w3.org/WAI/WCAG22/quickref/?versions=2.1&currentsidebar=%23col_customize&tags=forms&levels=a"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="How to Meet WCAG (Quick Reference) — W3C WAI (se abre en nueva pestaña)">
+          <div class="resource-icon" aria-hidden="true">🌐</div>
+          <div class="resource-body">
+            <div class="resource-title">How to Meet WCAG — Quick Reference</div>
+            <div class="resource-desc">Referencia rápida y personalizable de los criterios de conformidad de las WCAG, con técnicas y fallos documentados. Publicada por el W3C WAI.</div>
+            <div class="resource-url">w3.org/WAI/WCAG22/quickref/</div>
+          </div>
+          <div class="resource-arrow" aria-hidden="true">↗</div>
+        </a>
+
+        <a class="resource-link" role="listitem"
+           href="https://www.usableyaccesible.com/archivos/Accesibilidad_Web_WCAG_2_2_2024_Revilla_Carreras_protegido.pdf"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Accesibilidad Web: WCAG 2.2 de forma sencilla — Olga Revilla y Olga Carreras (se abre en nueva pestaña)">
+          <div class="resource-icon" aria-hidden="true">📖</div>
+          <div class="resource-body">
+            <div class="resource-title">Accesibilidad Web: WCAG 2.2 de forma sencilla</div>
+            <div class="resource-desc">Olga Revilla y Olga Carreras · 2024. Guía práctica en español que explica los criterios de las WCAG 2.2 de manera clara y aplicada.</div>
+            <div class="resource-url">usableyaccesible.com</div>
+          </div>
+          <div class="resource-arrow" aria-hidden="true">↗</div>
+        </a>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+const DATA = {"tabs": [{"name": "🎹 Teclado", "criterios": "2.1.1 · 2.1.2 · 2.1.4 · 2.4.1 · 2.4.3 · 2.4.7 · 2.4.11 · 3.2.1 · 1.4.13", "desc": "Navegación completa sin ratón, foco visible y predecible, sin trampas, atajos seguros"}, {"name": "👁 Visual", "criterios": "1.4.1 · 1.4.2 · 1.4.3 · 1.4.4 · 1.4.5 · 1.4.10 · 1.4.11 · 1.4.12 · 1.3.3 · 1.3.4 · 2.3.1 · 2.2.2", "desc": "Contraste, zoom, reflow, espaciado, color, orientación, animaciones"}, {"name": "🔊 Lector pantalla", "criterios": "1.1.1 · 1.3.1 · 1.3.2 · 2.4.4 · 2.4.6 · 2.5.3 · 3.1.1 · 3.1.2 · 4.1.2 · 4.1.3", "desc": "Nombres accesibles, estructura semántica, roles, estados, idioma, mensajes dinámicos"}, {"name": "📝 Formularios", "criterios": "1.3.5 · 2.4.2 · 3.2.2 · 3.3.1 · 3.3.2 · 3.3.3 · 3.3.4 · 3.3.7 · 3.3.8", "desc": "Etiquetas, errores, autocomplete, prevención, autenticación accesible"}, {"name": "🎥 Multimedia", "criterios": "1.2.1 · 1.2.2 · 1.2.3 · 1.2.4 · 1.2.5", "desc": "Subtítulos, transcripciones, audiodescripción en vídeo y audio"}, {"name": "📐 Contenido", "criterios": "2.2.1 · 2.4.5 · 3.2.3 · 3.2.4 · 3.2.6", "desc": "Consistencia de navegación, múltiples vías, tiempos, ayuda contextual"}, {"name": "👆 Puntero-Táctil", "criterios": "2.5.1 · 2.5.2 · 2.5.4 · 2.5.7 · 2.5.8", "desc": "Gestos, arrastre, tamaño de objetivo, cancelación, actuación por movimiento"}], "sections": {"🎹 Teclado": [{"pauta": "2.1 Teclado accesible", "id": "2.1.1", "criterio": "Teclado", "nivel": "A", "rol": "Desarrollo", "metodo": "Teclado", "como": "Desconecta el ratón (o simplemente no lo uses durante esta prueba).\nNavega toda la interfaz usando únicamente el teclado:\n— Tab: mover al siguiente elemento interactivo.\n— Shift+Tab: volver al anterior.\n— Enter o Espacio: activar botones, abrir menús o marcar checkboxes.\n— Flechas del cursor: navegar dentro de componentes (menús, pestañas, sliders, grupos de radio).\nVerifica que puedes llegar a TODOS los controles interactivos y operar todas las funciones.\nPresta especial atención a: menús desplegables, modales, datepickers, carruseles y cualquier componente con interacción compleja.", "pasa": "Todos los elementos interactivos reciben foco con Tab y pueden activarse con Enter o Espacio. Todas las funciones disponibles con ratón también están disponibles con teclado.", "falla": "Algún elemento interactivo no recibe foco al tabular (el Tab lo salta). Alguna función solo puede realizarse con ratón o con gestos de ratón (drag, hover). El foco llega al elemento pero no puede activarse con teclado."}, {"pauta": "2.1 Teclado accesible", "id": "2.1.2", "criterio": "Sin trampa de teclado", "nivel": "A", "rol": "Desarrollo", "metodo": "Teclado", "como": "Navega con Tab hacia componentes complejos que contienen muchos elementos internos: modales, paneles laterales, datepickers, iframes embebidos, widgets de terceros.\nUna vez dentro, intenta salir de cada componente usando Tab (hacia adelante) o Shift+Tab (hacia atrás).\nEn los modales, intenta también cerrarlos con Escape.\nVerifica que siempre puedes continuar la navegación hacia el resto de la página.", "pasa": "El foco puede entrar y salir de cualquier componente usando el teclado. Siempre hay un camino de salida, ya sea con Tab, Shift+Tab o Escape.", "falla": "El foco queda atrapado dentro de un componente y no hay forma de salir sin usar el ratón. Esto es especialmente común en modales y widgets de terceros mal implementados."}, {"pauta": "2.1 Teclado accesible", "id": "2.1.4", "criterio": "Atajos de teclado de un carácter", "nivel": "A", "rol": "Desarrollo", "metodo": "Teclado", "como": "Comprueba si la interfaz define atajos de teclado que se activan con una sola tecla de carácter (una letra, un número o un símbolo de puntuación).\nSi existen, verifica al menos una de estas condiciones:\n— Se pueden desactivar completamente por el usuario.\n— Se pueden remapear a una combinación de teclas que incluya Ctrl, Alt o similar.\n— Solo se activan cuando el foco está en el componente concreto que los usa (foco contextual).\nLos atajos de un solo carácter interfieren con los lectores de pantalla y el dictado por voz, que usan letras sueltas para navegar.", "pasa": "No existen atajos de carácter único activos globalmente, o si existen, pueden desactivarse o remapearse.", "falla": "Hay atajos de carácter único siempre activos que interfieren con la navegación por teclado o con herramientas de dictado por voz."}, {"pauta": "2.4 Navegable", "id": "2.4.1", "criterio": "Saltar bloques", "nivel": "A", "rol": "Desarrollo", "metodo": "Teclado", "como": "Carga la página y presiona Tab por primera vez.\nEl primer o uno de los primeros elementos en recibir foco debe ser un enlace de tipo \"Saltar al contenido principal\" (o similar: \"Ir al contenido\", \"Skip to main content\").\nPresiona Enter para activarlo. Verifica que el foco salta directamente al contenido principal de la página, saltando el menú de navegación y otros bloques repetidos.", "pasa": "Al primer Tab aparece un enlace visible de \"saltar al contenido\" que al activarse mueve el foco al contenido principal de la página.", "falla": "No hay enlace de salto. O existe pero está permanentemente oculto (ni siquiera aparece al recibir foco). O existe y es visible pero al activarlo no mueve el foco al lugar correcto."}, {"pauta": "2.4 Navegable", "id": "2.4.3", "criterio": "Orden del foco", "nivel": "A", "rol": "Desarrollo", "metodo": "Teclado", "como": "Navega toda la página con Tab de principio a fin, observando el orden en que el foco va pasando por los elementos.\nComprueba que el orden tiene sentido y sigue el flujo lógico del contenido (de arriba a abajo, de izquierda a derecha en la mayoría de los casos).\nPresta atención especial a cuando se abren modales o notificaciones dinámicas: el foco debe moverse al nuevo contenido y volver correctamente al cerrar.", "pasa": "El orden de tabulación es lógico y predecible. Al abrir un modal, el foco entra en él; al cerrarlo, vuelve al punto de origen.", "falla": "El Tab salta de forma errática entre secciones no relacionadas, o al abrir un modal el foco no entra en él (el usuario sigue tabulando por el fondo)."}, {"pauta": "2.4 Navegable", "id": "2.4.7", "criterio": "Foco visible", "nivel": "AA", "rol": "Diseño", "metodo": "Teclado", "como": "Navega toda la interfaz con Tab, sin usar el ratón.\nEn cada elemento que recibe el foco, verifica que se muestra un indicador visual claro: un contorno, un subrayado, un cambio de color de fondo u otro efecto visual que señale dónde está el foco en ese momento.\nNingún elemento debe perder completamente el indicador de foco.", "pasa": "En todo momento el usuario puede ver claramente qué elemento tiene el foco de teclado. (contraste de 3:1)", "falla": "Al tabular, el foco se vuelve invisible en algún punto. El indicador ha sido eliminado con CSS (outline: none) sin haberlo sustituido por un indicador alternativo."}, {"pauta": "2.4 Navegable", "id": "2.4.11", "criterio": "Foco no oscurecido (mínimo)", "nivel": "AA", "rol": "Diseño", "metodo": "Teclado", "como": "Navega con Tab por toda la interfaz, prestando especial atención a los elementos que están en la parte superior e inferior de la pantalla y a los que están cerca de elementos superpuestos (headers fijos, banners de cookies, sidebars, modales de chat).\nCuando un elemento recibe el foco, comprueba que no queda completamente tapado por otro elemento fijo o flotante.\nBasta con que sea parcialmente visible; no es necesario que esté completamente descubierto.", "pasa": "Cuando un elemento recibe el foco, es al menos parcialmente visible en la pantalla, sin quedar completamente cubierto por otro elemento.", "falla": "Al tabular, el elemento enfocado queda completamente oculto detrás de un header fijo, un banner de cookies, un chat flotante u otro elemento con posición fija o sticky."}, {"pauta": "3.2 Predecible", "id": "3.2.1", "criterio": "Al recibir el foco", "nivel": "A", "rol": "Desarrollo", "metodo": "Teclado", "como": "Navega con Tab por todos los elementos interactivos de la página.\nMientras el foco pasa por cada elemento, observa si se produce algún cambio no esperado: ¿se navega a otra página? ¿se abre un modal o un popup? ¿se envía algún formulario automáticamente?\nNinguno de estos cambios debería ocurrir solo por el hecho de que el foco llegue al elemento.", "pasa": "Ningún elemento provoca un cambio de contexto (navegación, apertura de modal, envío de formulario) automáticamente por recibir el foco.", "falla": "Al llegar con Tab a un select, un enlace o cualquier control, la página navega o aparece un modal/popup sin que el usuario haya activado el control. Esto desorientan especialmente a usuarios de lector de pantalla."}, {"pauta": "1.4 Distinguible", "id": "1.4.13", "criterio": "Contenido al pasar el ratón o enfocar", "nivel": "AA", "rol": "Desarrollo", "metodo": "Teclado + ratón", "como": "Busca elementos que muestran contenido adicional al hacer hover (pasar el ratón por encima) o al recibir foco con el teclado: tooltips, submenús desplegables, popups de ayuda.\nPara cada uno, comprueba las tres condiciones que exige el criterio:\n1. Descartable: el contenido emergente se puede cerrar con la tecla Escape sin mover el foco.\n2. Con posibilidad de hover: el puntero puede entrar en el tooltip sin que este desaparezca (no desaparece al moverlo).\n3. Persistente: el contenido se mantiene visible hasta que el usuario lo cierra activamente o mueve el foco lejos.", "pasa": "Los tooltips y menús emergentes: se pueden cerrar con Escape, no desaparecen al mover el cursor sobre ellos, y permanecen visibles hasta que el usuario los descarta.", "falla": "El tooltip desaparece en cuanto el cursor se mueve encima de él (no es hoverable). No se puede cerrar con Escape. Desaparece automáticamente después de unos segundos sin que el usuario lo haya descartado."}], "👁 Visual": [{"pauta": "1.4 Distinguible", "id": "1.4.1", "criterio": "Uso del color", "nivel": "A", "rol": "Diseño", "metodo": "Simulación de daltonismo", "como": "Identifica todos los elementos donde el color comunica información: campos obligatorios marcados en rojo, estados activos resaltados en azul, categorías diferenciadas por color, enlaces sin subrayado, mensajes de error solo en rojo.\nActiva la simulación de daltonismo en Chrome DevTools: F12 → Más herramientas → Rendering → \"Emulate vision deficiencies\" (prueba al menos Deuteranopia y Protanopia).\nComprueba que la información sigue siendo comprensible sin distinguir los colores.", "pasa": "Toda la información transmitida por color también se comunica por otro medio: texto, icono, patrón, subrayado u otra indicación visual no dependiente del color.", "falla": "El único indicador de un estado, error, categoría u obligatoriedad es el color, sin apoyo textual ni icónico. Por ejemplo: solo el borde rojo indica un error de validación, sin texto de error."}, {"pauta": "1.4 Distinguible", "id": "1.4.2", "criterio": "Control de audio", "nivel": "A", "rol": "Desarrollo", "metodo": "Revisión manual", "como": "Al cargar la página, observa si hay algún audio que empiece a sonar automáticamente durante más de 3 segundos (vídeo autoplay, música de fondo, anuncio).\nSi existe, comprueba que hay un control accesible (botón, icono de altavoz) para pausarlo, detenerlo o silenciarlo.\nVerifica que ese control es operable con teclado y que el lector de pantalla lo anuncia correctamente.", "pasa": "Cualquier audio que se reproduce solo puede pausarse o silenciarse de forma sencilla desde la interfaz, incluso con teclado.", "falla": "Hay audio que empieza automáticamente y no hay forma de pararlo desde la interfaz, o el control de audio no es accesible con teclado."}, {"pauta": "1.4 Distinguible", "id": "1.4.3", "criterio": "Contraste mínimo", "nivel": "AA", "rol": "Diseño", "metodo": "Herramienta de contraste", "como": "Herramientas:\nExtensiones Google Chrome y Firefox:\n- wave\n- DevTools\n\nMide el ratio de contraste entre el color del texto y el color de su fondo inmediato.\nRangos mínimos obligatorios:\n— Texto normal (menos de 18pt, o menos de 14pt en negrita): ratio mínimo 4.5:1.\n— Texto grande (18pt o más, o 14pt o más en negrita): ratio mínimo 3:1.\nRevisa también: placeholders de formulario, texto sobre imágenes o gradientes y textos en estados desactivados (disabled).", "pasa": "Todos los textos superan el ratio de contraste mínimo según su tamaño. La herramienta muestra el ratio y el resultado PASS.\n+ 4.5:1", "falla": "Algún texto no alcanza el ratio mínimo. La herramienta muestra FAIL. Errores frecuentes: texto gris claro sobre fondo blanco, texto blanco sobre colores de marca saturados o placeholders con bajo contraste."}, {"pauta": "1.4 Distinguible", "id": "1.4.4", "criterio": "Cambiar el tamaño del texto", "nivel": "AA", "rol": "Desarrollo", "metodo": "Zoom del navegador", "como": "Aumenta el zoom del navegador hasta el 200% usando Ctrl+= (Windows/Linux) o Cmd+= (Mac) de forma repetida, o desde Ver → Zoom.\nNavega por todas las secciones de la página con este nivel de zoom.\nComprueba que el texto crece de tamaño, sigue siendo legible y no queda cortado ni oculto detrás de otros elementos.", "pasa": "A 200% de zoom todos los textos aumentan de tamaño y el contenido sigue siendo completamente legible y funcional. No hay elementos que se corten ni se superpongan.", "falla": "Al ampliar al 200%, el texto queda cortado, desborda su contenedor, queda tapado por otro elemento o desaparece. También falla si el texto no escala porque está definido en píxeles absolutos (px) en lugar de em o rem."}, {"pauta": "1.4 Distinguible", "id": "1.4.5", "criterio": "Imágenes de texto", "nivel": "AA", "rol": "Diseño", "metodo": "Revisión manual", "como": "Identifica imágenes que muestran texto: titulares como imagen PNG, banners con texto incrustado, botones como imagen, capturas de pantalla usadas como contenido.\nComprueba si ese texto podría haberse implementado como texto HTML real con estilos CSS.\nEl único caso aceptable es el logotipo o texto que forma parte intrínseca de la marca visual.", "pasa": "El texto está implementado como texto real (HTML + CSS) en todos los casos posibles. Solo se aceptan imágenes de texto para logotipos.", "falla": "Se usan imágenes para mostrar texto que podría ser texto real: titulares, párrafos, etiquetas, botones. El texto en imágenes no escala bien, no puede seleccionarse y el lector no puede leerlo sin un alt adecuado."}, {"pauta": "1.4 Distinguible", "id": "1.4.10", "criterio": "Reajuste (Reflow)", "nivel": "AA", "rol": "Desarrollo", "metodo": "Viewport estrecho / Zoom al 400%", "como": "Reduce el viewport del navegador a 320px de ancho usando las DevTools en modo responsive (icono de móvil en las DevTools → ancho 320px).\nAlternativamente, aplica zoom al 400% en el navegador (desktop).\nNavega toda la página a este tamaño y comprueba que:\n— No aparece scroll horizontal.\n— Todo el contenido es visible y legible.\n— Todas las funciones siguen siendo operables.\nLos 320px son el equivalente a un iPhone 5 en portrait, o a zoom al 400% en pantalla 1280px.", "pasa": "A 320px de ancho (o zoom al 400%) todo el contenido se reorganiza de forma vertical, es legible y completamente operable sin scroll horizontal.", "falla": "Aparece scroll horizontal a 320px, algún contenido queda cortado fuera del viewport, o algún control deja de funcionar o resulta inaccesible a ese tamaño."}, {"pauta": "1.4 Distinguible", "id": "1.4.11", "criterio": "Contraste no textual", "nivel": "AA", "rol": "Diseño", "metodo": "Herramienta de contraste", "como": "Identifica componentes de interfaz que transmiten información sin ser texto: bordes de campos de formulario (input, select, textarea), iconos que actúan como contenido (sin texto alternativo), indicadores de foco, checkboxes y radios, gráficos de datos, botones solo con icono.\nMide el contraste entre el componente (o su borde) y el color de fondo adyacente.\nEl ratio mínimo es 3:1 para todos estos elementos.", "pasa": "Los bordes de inputs, iconos funcionales, indicadores de estado y otros componentes de interfaz tienen un ratio de contraste de al menos 3:1 respecto a su fondo.", "falla": "Los bordes de los campos de formulario son tan claros que apenas se distinguen del fondo. Los iconos sin texto tienen bajo contraste. Los indicadores de foco (el contorno al tabular) no alcanzan 3:1."}, {"pauta": "1.4 Distinguible", "id": "1.4.12", "criterio": "Espaciado del texto", "nivel": "AA", "rol": "Desarrollo", "metodo": "Bookmarklet de espaciado", "como": "Usa el bookmarklet de Text Spacing (búscalo como \"Text Spacing Bookmarklet\" de Steve Faulkner o Squizlabs).\nAl activarlo, inyecta en la página estos estilos de espaciado ampliado que WCAG especifica como prueba:\n— Altura de línea: 1.5x el tamaño de fuente.\n— Espaciado entre letras: 0.12em.\n— Espaciado entre palabras: 0.16em.\n— Espacio tras párrafos: 2em.\nNavega la página con estos estilos activos y verifica que nada se corta ni desaparece.", "pasa": "Con los estilos de espaciado ampliado activos, todo el texto sigue siendo legible y ningún contenido queda oculto, cortado ni solapado.", "falla": "Al aplicar el espaciado ampliado, algún texto queda cortado por su contenedor, se solapa con otros elementos o desaparece. Suele ocurrir cuando los contenedores tienen altura fija en píxeles."}, {"pauta": "1.3 Adaptable", "id": "1.3.3", "criterio": "Características sensoriales", "nivel": "A", "rol": "Diseño", "metodo": "Revisión manual", "como": "Lee todas las instrucciones y textos de orientación de la interfaz.\nBusca frases que guíen al usuario usando únicamente forma, color, tamaño o posición espacial para indicar algo: \"pulsa el botón redondo\", \"el menú de la derecha\", \"el campo resaltado en rojo\".\nSi las encuentras, comprueba que hay siempre una referencia adicional que no dependa de percepción sensorial (por ejemplo: \"el botón Cancelar, situado en la esquina superior derecha\").", "pasa": "Todas las instrucciones incluyen información textual o contextual que no depende de percepción visual, auditiva o de posición espacial.", "falla": "Las instrucciones usan únicamente \"el botón verde\", \"el icono de la izquierda\" o \"el campo marcado\" sin ningún complemento textual que permita identificar el elemento de otra forma."}, {"pauta": "1.3 Adaptable", "id": "1.3.4", "criterio": "Orientación", "nivel": "A", "rol": "Diseño", "metodo": "Rotación de pantalla", "como": "Abre el sitio web en un dispositivo móvil o en el simulador de las DevTools del navegador (modo responsive).\nCambia la orientación entre vertical (portrait) y horizontal (landscape).\nVerifica que el contenido se adapta sin bloquearse en ninguna de las dos orientaciones y sin perder funcionalidad.", "pasa": "El contenido es completamente funcional tanto en vertical como en horizontal. La interfaz se adapta sin cortar ni ocultar elementos.", "falla": "La app o web bloquea la orientación, o al rotar el dispositivo el contenido queda cortado, ilegible o alguna función deja de ser accesible."}, {"pauta": "2.3 Convulsiones y reacciones físicas", "id": "2.3.1", "criterio": "Tres destellos o menos", "nivel": "A", "rol": "Diseño", "metodo": "Revisión manual", "como": "Identifica si hay contenido que destella, parpadea o cambia rápidamente de luminosidad en la página.\nSi lo encuentras, verifica que:\n— No destella más de 3 veces por segundo en ningún área visible de la pantalla.\n— O que el área que destella es pequeña (menor del 25% del campo visual central, aproximadamente un cuadrado de 341×256px en una pantalla de 1024px a distancia normal).\nSi tienes dudas sobre si supera el umbral, puedes usar la herramienta PEAT (Photosensitive Epilepsy Analysis Tool).", "pasa": "No hay contenido que destelle más de 3 veces por segundo, o el área afectada es suficientemente pequeña para no superar el umbral fotosensible.", "falla": "Hay vídeos, animaciones o transiciones que contienen destellos rápidos en un área significativa de la pantalla."}, {"pauta": "2.2 Tiempo suficiente", "id": "2.2.2", "criterio": "Pausar, detener, ocultar", "nivel": "A", "rol": "Desarrollo", "metodo": "Revisión manual", "como": "Identifica todo el contenido que se mueve, se actualiza o se desplaza automáticamente: carruseles con avance automático, tickers de noticias, animaciones de carga decorativas, vídeos que empiezan solos.\nPara cada uno, verifica que hay un control visible y accesible (un botón de pausa, un control de stop) que permite detener el movimiento.\nEl control debe ser operable con teclado.", "pasa": "Todo el contenido en movimiento automático tiene un control de pausa o stop visible, y ese control es operable con teclado.", "falla": "Hay animaciones, carruseles o tickers que se mueven solos sin control de pausa. O el control de pausa existe pero no es accesible con teclado."}], "🔊 Lector pantalla": [{"pauta": "1.1 Alternativas de texto", "id": "1.1.1", "criterio": "Contenido no textual", "nivel": "A", "rol": "Ambos", "metodo": "Lector de pantalla", "como": "Activa el lector de pantalla (VoiceOver en Mac/iOS con Cmd+F5 o triple clic lateral; NVDA en Windows).\nNavega por imágenes, iconos, gráficos y cualquier elemento visual que no sea texto.\nEscucha qué anuncia el lector para cada uno.\n\nClave técnica: el lector lee el \"nombre accesible\" del elemento. Ese nombre viene del atributo alt en imágenes HTML, del aria-label o del texto asociado en otros componentes. Si no existe ninguno, el lector anuncia el nombre del archivo o simplemente \"imagen\".", "pasa": "El lector anuncia una descripción significativa que explica qué muestra o qué función tiene el elemento. Las imágenes puramente decorativas no generan ningún anuncio (tienen alt vacío o aria-hidden).", "falla": "El lector dice \"imagen\" sin descripción, anuncia el nombre del archivo (ej. \"hero_banner_final_v2.png\") o no anuncia nada en un elemento que transmite información importante.\nTambién falla si imágenes decorativas (fondos, separadores) interrumpen la lectura con anuncios innecesarios."}, {"pauta": "1.3 Adaptable", "id": "1.3.1", "criterio": "Información y relaciones", "nivel": "A", "rol": "Ambos", "metodo": "Lector de pantalla + Axe", "como": "Ejecuta un análisis automático con la extensión Axe DevTools en el navegador (pestaña axe en las DevTools). Revisa los errores de estructura.\nDespués, con el lector de pantalla, navega por:\n— Encabezados (en NVDA: tecla H; en VoiceOver: VO+Cmd+H). Comprueba que el lector los anuncia como \"Encabezado nivel 1\", \"Encabezado nivel 2\", etc.\n— Listas: el lector debe decir \"lista de N elementos\".\n— Tablas: el lector debe anunciar encabezados de columna y fila al moverse por las celdas.\n— Formularios: cada campo debe tener su etiqueta anunciada antes del tipo de campo.\n\nClave técnica: esta estructura se define en el HTML mediante etiquetas semánticas (h1-h6, ul, table, label) o mediante atributos ARIA (role, aria-label, aria-labelledby).", "pasa": "El lector anuncia correctamente la jerarquía de encabezados, el tipo de lista, los encabezados de tabla y las etiquetas de formulario. La estructura que se ve visualmente se corresponde con lo que escucha el lector.", "falla": "El lector no distingue encabezados (los anuncia como texto normal), no reconoce las listas como tales, en las tablas no anuncia encabezados de columna, o los campos de formulario no tienen etiqueta.\nEsto suele ocurrir cuando los desarrolladores usan elementos genéricos (div, span) para imitar visualmente una estructura sin aplicar el código semántico correspondiente."}, {"pauta": "1.3 Adaptable", "id": "1.3.2", "criterio": "Secuencia significativa", "nivel": "A", "rol": "Ambos", "metodo": "Lector de pantalla", "como": "Activa el lector de pantalla y lee el contenido de la página en orden secuencial (con las flechas, sin usar el ratón).\nCompara mentalmente si el orden en que escuchas el contenido tiene sentido y coincide con el flujo visual de la página.\nPresta especial atención a columnas de contenido, tarjetas y componentes con posicionamiento CSS complejo.", "pasa": "El orden en que el lector lee el contenido es coherente con el flujo visual y con la lógica de la página. Se puede entender el contenido sin ver la maquetación.", "falla": "El lector lee elementos fuera de contexto: por ejemplo, lee el pie de página antes del contenido principal, o en un formulario lee el botón de envío antes que los campos.\nEsto suele pasar cuando el orden visual se consigue con CSS (flex-direction: column-reverse, position: absolute) sin ajustar el orden del DOM."}, {"pauta": "2.4 Navegable", "id": "2.4.4", "criterio": "Propósito del enlace (en contexto)", "nivel": "A", "rol": "Ambos", "metodo": "Lector de pantalla", "como": "Con el lector de pantalla activo, accede al modo de navegación por enlaces (en NVDA: tecla L repetida; en VoiceOver: VO+Cmd+L para listar todos los enlaces).\nEscucha el texto de cada enlace por separado, sin leer el texto circundante.\nPregúntate: ¿puedo saber adónde lleva este enlace o qué hace, solo con el texto que escucho?\nSi el texto del enlace es genérico (\"aquí\", \"leer más\", \"ver\", \"clic\"), comprueba si el contexto inmediato (la misma frase, el mismo párrafo, el encabezado anterior) aclara suficientemente el destino.", "pasa": "El texto de cada enlace describe claramente su destino o función, ya sea por sí solo o junto al contexto inmediato.", "falla": "Hay múltiples enlaces que dicen \"leer más\" o \"ver más\" apuntando a destinos diferentes. O el texto del enlace es \"aquí\" sin que el contexto aclare a dónde lleva."}, {"pauta": "2.4 Navegable", "id": "2.4.6", "criterio": "Encabezados y etiquetas", "nivel": "AA", "rol": "Ambos", "metodo": "Lector de pantalla + inspección", "como": "Con el lector de pantalla, navega por los encabezados de la página (NVDA: tecla H; VoiceOver: VO+Cmd+H).\nEscucha si el texto de cada encabezado describe realmente la sección que introduce.\nLuego revisa las etiquetas de los campos de formulario: activa el lector y llega a cada campo con Tab. El lector debe anunciar la etiqueta antes del tipo de campo.", "pasa": "Los encabezados describen el contenido que encabezan. Las etiquetas de formulario describen qué dato debe introducirse.", "falla": "Los encabezados son genéricos (Sección, Módulo 1) o no hay relación entre el encabezado y el contenido siguiente. Los campos de formulario carecen de etiqueta o la etiqueta no es descriptiva."}, {"pauta": "2.5 Modalidades de entrada", "id": "2.5.3", "criterio": "Etiqueta en el nombre accesible", "nivel": "A", "rol": "Desarrollo", "metodo": "Lector de pantalla + DevTools", "como": "Identifica controles con texto visible: botones con texto, checkboxes con etiqueta, campos con placeholder visible, enlaces con texto.\nPara cada uno, inspecciona el nombre accesible en las DevTools (F12 → pestaña Accessibility → \"Name\").\nComprueba que el nombre accesible contiene el mismo texto que se ve visualmente (puede tener más, pero debe incluirlo).\n\n¿Por qué importa? Las personas que usan dictado por voz dicen el texto visible para activar el control. Si el nombre accesible es diferente, el comando no funciona.", "pasa": "El nombre accesible de cada control incluye el texto visible. Si el botón dice \"Enviar\", el nombre accesible contiene \"Enviar\".", "falla": "El nombre accesible es completamente diferente al texto visible, o no lo incluye. Ejemplo: el botón dice \"Guardar\" pero el aria-label es \"submit-action\"."}, {"pauta": "3.1 Legible", "id": "3.1.1", "criterio": "Idioma de la página", "nivel": "A", "rol": "Desarrollo", "metodo": "Inspección de código", "como": "Abre el código fuente de la página y busca la etiqueta de apertura del HTML: <html>.\nComprueba que tiene el atributo lang con el código correcto del idioma principal.\nEjemplos: lang=\"es\" para español, lang=\"ca\" para catalán, lang=\"en\" para inglés, lang=\"fr\" para francés.\n\n¿Por qué importa? El lector de pantalla usa este atributo para seleccionar el motor de voz correcto y pronunciar el contenido con el acento del idioma. Sin él, el lector puede pronunciar el español con voz inglesa, por ejemplo.", "pasa": "El elemento <html> tiene el atributo lang con un código de idioma correcto y completo.", "falla": "Falta el atributo lang. O está presente pero vacío (lang=\"\"). O el código de idioma es incorrecto (ej. lang=\"spanish\" en lugar de lang=\"es\")."}, {"pauta": "3.1 Legible", "id": "3.1.2", "criterio": "Idioma de las partes", "nivel": "AA", "rol": "Desarrollo", "metodo": "Inspección de código", "como": "Identifica fragmentos de texto en un idioma diferente al de la página: citas en inglés en una web en español, términos técnicos en latín, un bloque de contenido en catalán dentro de una web en castellano.\nComprueba que el contenedor de ese fragmento (el párrafo, el span, el bloque) tiene el atributo lang con el código correcto del idioma de ese fragmento.\nEjemplo: <p lang=\"en\">This is a quote in English.</p>", "pasa": "Los fragmentos en idioma diferente al principal tienen el atributo lang correcto en su elemento contenedor.", "falla": "Fragmentos en otro idioma no tienen atributo lang. El lector los pronunciará con la voz del idioma principal, haciéndolos incomprensibles."}, {"pauta": "4.1 Compatible", "id": "4.1.2", "criterio": "Nombre, rol, valor", "nivel": "A", "rol": "Desarrollo", "metodo": "Lector de pantalla + DevTools", "como": "Con el lector de pantalla activo, navega por todos los componentes interactivos de la interfaz: botones, enlacés, menús, pestañas, acordeones, modales, formularios, sliders, carruseles, datepickers.\nPara cada uno, escucha:\n— Nombre: ¿el lector anuncia un texto que describe el control?\n— Rol: ¿el lector anuncia qué tipo de control es (botón, enlace, casilla de verificación, menú)?\n— Estado: ¿el lector anuncia el estado actual cuando aplica (expandido/contraído, seleccionado/no seleccionado, activado/desactivado)?\n\nPuedes verificar el nombre y rol visualmente en las DevTools: F12 → pestaña Accessibility → árbol de accesibilidad.\n\nClave técnica: para componentes HTML nativos (button, input, a) el nombre, rol y valor son automáticos. Para componentes personalizados (divs y spans con interactividad) hay que añadirlos con atributos ARIA: role, aria-label, aria-expanded, aria-checked, aria-selected.", "pasa": "El lector anuncia nombre descriptivo, rol correcto y estado actualizado para cada componente interactivo. Al expandir un acordeón, el lector dice \"expandido\"; al marcar un checkbox, dice \"marcado\".", "falla": "El lector dice solo \"grupo\", \"div\" o \"elemento\" sin nombre ni rol reconocible.\nUn acordeón no comunica si está expandido o contraído. Un modal se abre pero el foco no entra y el lector no lo anuncia.\nLos estados (seleccionado, activo, expandido) no se actualizan dinámicamente."}, {"pauta": "4.1 Compatible", "id": "4.1.3", "criterio": "Mensajes de estado", "nivel": "AA", "rol": "Desarrollo", "metodo": "Lector de pantalla", "como": "Activa el lector de pantalla.\nRealiza acciones que generan mensajes de feedback en la interfaz sin navegar a una nueva página:\n— Añadir un producto al carrito.\n— Guardar cambios en un formulario.\n— Completar una búsqueda (\"Se encontraron 12 resultados\").\n— Recibir un error de red.\nDespués de cada acción, sin mover el foco, escucha si el lector anuncia el mensaje automáticamente.\n\nClave técnica: estos mensajes deben implementarse con role=\"status\" (para avisos no urgentes) o role=\"alert\" (para errores) o con aria-live en el contenedor, para que el lector los anuncie sin necesidad de que el foco se mueva al mensaje.", "pasa": "Los mensajes de estado (éxito, error, actualización de datos) son anunciados automáticamente por el lector de pantalla, aunque el foco no se mueva.", "falla": "El mensaje aparece visualmente pero el lector no lo anuncia. El usuario de lector de pantalla no sabe si la acción se completó correctamente."}], "📝 Formularios": [{"pauta": "1.3 Adaptable", "id": "1.3.5", "criterio": "Identificar el propósito de la entrada", "nivel": "AA", "rol": "Desarrollo", "metodo": "Inspección de código", "como": "Inspecciona el código HTML de los campos de formulario que recopilan datos personales (nombre, apellido, email, teléfono, dirección, contraseña, fecha de nacimiento, tarjeta de crédito).\nComprueba que cada campo tiene el atributo autocomplete con un valor reconocido por el estándar.\nEjemplos correctos: autocomplete=\"given-name\", autocomplete=\"email\", autocomplete=\"tel\", autocomplete=\"current-password\".\nConsulta la lista completa en: https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofilling-form-controls\n\nEste atributo permite que el navegador y las herramientas de asistencia autocompleten o sugieran valores, reduciendo la carga cognitiva y motriz del usuario.", "pasa": "Los campos de datos personales tienen el atributo autocomplete con un valor válido del estándar. El navegador puede autocompletar esos campos.", "falla": "Faltan los atributos autocomplete en campos de datos personales, o tienen valores incorrectos (ej. autocomplete=\"off\" en un campo de nombre) o valores inventados que no pertenecen al estándar."}, {"pauta": "3.3 Asistencia de entrada", "id": "3.3.1", "criterio": "Identificación de errores", "nivel": "A", "rol": "Desarrollo", "metodo": "Lector de pantalla + visual", "como": "Envía un formulario con datos inválidos o con campos obligatorios vacíos.\nComprueba visualmente que aparecen mensajes de error.\nLuego activa el lector de pantalla y repite: ¿el lector anuncia automáticamente los errores o tienes que ir a buscarlos navegando?\nPara cada mensaje de error, verifica que: nombra el campo afectado, describe en qué consiste el error, y no usa solo el color rojo como indicador.\n\nClave técnica: los errores deben estar vinculados al campo con aria-describedby, o el mensaje debe tener role=\"alert\" para que el lector lo anuncie automáticamente.", "pasa": "Los mensajes de error identifican el campo afectado y describen el problema. El lector de pantalla los anuncia automáticamente o el usuario puede encontrarlos navegando.", "falla": "El error se indica solo con un borde rojo sin texto descriptivo. O el lector no anuncia el error porque el mensaje no está vinculado al campo ni tiene rol de alerta."}, {"pauta": "3.3 Asistencia de entrada", "id": "3.3.2", "criterio": "Etiquetas o instrucciones", "nivel": "A", "rol": "Diseño", "metodo": "Revisión visual + lector", "como": "Revisa cada campo de formulario:\n— ¿Tiene una etiqueta de texto visible y permanente (no solo placeholder, que desaparece al escribir)?\n— Si el campo tiene requisitos de formato (fecha con guiones, contraseña con mayúsculas y números), ¿esa información está visible antes o junto al campo, no solo en el mensaje de error?\nActiva el lector de pantalla y navega por los campos: el lector debe anunciar la etiqueta antes de anunciar el tipo de campo.", "pasa": "Todos los campos tienen etiqueta visible y permanente. Los requisitos de formato se explican antes de que el usuario intente introducir los datos.", "falla": "Los campos solo tienen placeholder como indicación (desaparece al empezar a escribir). Las instrucciones de formato aparecen únicamente en el mensaje de error posterior. El lector no anuncia etiqueta para algún campo."}, {"pauta": "3.3 Asistencia de entrada", "id": "3.3.3", "criterio": "Sugerencia de error", "nivel": "AA", "rol": "Desarrollo", "metodo": "Revisión manual", "como": "Provoca diferentes tipos de error: deja obligatorios vacíos, introduce un email sin @, una fecha en formato incorrecto, una contraseña demasiado corta.\nPara cada error, lee el mensaje que aparece.\nEl mensaje no solo debe identificar que hay un error, sino también decirle al usuario cómo corregirlo.", "pasa": "Los mensajes de error explican concretamente cómo corregir el problema. Ejemplo: \"Introduce un email válido con @\" en lugar de solo \"Email incorrecto\".", "falla": "Los mensajes de error son genéricos: \"Campo inválido\", \"Error\", \"Formato incorrecto\", sin indicar qué formato se espera ni cómo solucionarlo."}, {"pauta": "3.3 Asistencia de entrada", "id": "3.3.4", "criterio": "Prevención de errores (legales, financieros)", "nivel": "AA", "rol": "Desarrollo", "metodo": "Revisión manual", "como": "Identifica acciones con consecuencias importantes que son difíciles o imposibles de revertir: pagos, contratación de servicios, eliminación permanente de datos, envío de formularios legales.\nPara cada acción, verifica que se cumple al menos una de estas tres condiciones:\n— La acción es reversible (se puede deshacer).\n— El usuario puede revisar y corregir los datos antes de confirmar.\n— Se solicita una confirmación explícita antes de ejecutar la acción.", "pasa": "Antes de ejecutar acciones de consecuencias graves, el usuario puede revisar, corregir o confirmar. O la acción puede deshacerse.", "falla": "Se puede completar un pago, firmar un contrato o borrar una cuenta sin ninguna pantalla de revisión, confirmación ni posibilidad de deshacer."}, {"pauta": "3.3 Asistencia de entrada", "id": "3.3.7", "criterio": "Entrada redundante", "nivel": "A", "rol": "Desarrollo", "metodo": "Revisión manual", "como": "Navega por flujos que constan de varios pasos: un proceso de compra (datos personales → dirección → pago → resumen), un formulario de registro multi-paso.\nObserva si en algún paso se pide al usuario introducir información que ya introdujo en un paso anterior (mismo email, misma dirección, mismo nombre).\nSi ocurre, verifica que los datos se pre-rellenan automáticamente o que hay una opción para seleccionarlos de lo ya introducido.", "pasa": "Los datos que el usuario ya introdujo en pasos anteriores del mismo flujo se pre-rellenan o están disponibles para seleccionarse sin volver a escribirlos.", "falla": "El usuario tiene que escribir el mismo nombre, dirección o cualquier otro dato más de una vez dentro del mismo flujo de tarea, sin que se ofrezca ninguna forma de reutilizarlo."}, {"pauta": "3.3 Asistencia de entrada", "id": "3.3.8", "criterio": "Autenticación accesible (mínima)", "nivel": "AA", "rol": "Desarrollo", "metodo": "Revisión manual", "como": "Prueba el flujo de login y registro.\nComprueba que no se exige al usuario superar una prueba cognitiva sin alternativa: un CAPTCHA de transcribir texto distorsionado, resolver un puzzle, memorizar y reproducir una secuencia.\nVerifica si existen alternativas accesibles: reconocimiento de objetos en imágenes (como el CAPTCHA de Google con semáforos), login con enlace mágico por email, autenticación biométrica, SSO con proveedor externo, o la posibilidad de copiar y pegar la contraseña.", "pasa": "El proceso de autenticación no requiere superar pruebas cognitivas sin alternativa. Existe al menos una forma de autenticarse que no depende de transcribir texto o resolver puzzles.", "falla": "El único método de login es un CAPTCHA de texto distorsionado o un puzzle cognitivo, sin ninguna alternativa más accesible."}, {"pauta": "2.4 Navegable", "id": "2.4.2", "criterio": "Página titulada", "nivel": "A", "rol": "Desarrollo", "metodo": "Inspección de código", "como": "Abre el código fuente de la página (clic derecho → Ver código fuente, o F12 → pestaña Elements) y busca el elemento <title> dentro del <head>.\nVerifica que el título:\n— Describe el contenido o propósito específico de esa página (no solo el nombre del sitio).\n— Es único para cada página del sitio.\nEjemplo correcto: \"Editar perfil · Nombre del sitio\". Ejemplo incorrecto: \"Nombre del sitio\" en todas las páginas.", "pasa": "Cada página tiene un <title> único y descriptivo que identifica su contenido específico.", "falla": "El <title> está vacío, es igual en todas las páginas, o solo contiene el nombre del sitio sin indicar qué página es."}, {"pauta": "3.2 Predecible", "id": "3.2.2", "criterio": "Al introducir datos", "nivel": "A", "rol": "Desarrollo", "metodo": "Teclado + revisión manual", "como": "Navega formularios con el teclado y cambia valores en los campos: selecciona una opción en un <select>, marca un checkbox, introduce texto en un input.\nObserva si al cambiar el valor de algún campo ocurre algo automático sin que hayas pulsado un botón: ¿navega a otra página? ¿recarga la página? ¿abre un modal?\nSi existe algún comportamiento automático, verifica que el usuario ha sido informado de antemano.", "pasa": "Modificar el valor de un campo no provoca un cambio de contexto automático. Si lo hace, el usuario ha sido informado antes de que ocurra.", "falla": "Al seleccionar una opción en un <select>, la página recarga o navega automáticamente, sin que el usuario haya activado ningún botón de confirmación."}], "🎥 Multimedia": [{"pauta": "1.2 Medios en el tiempo", "id": "1.2.1", "criterio": "Solo audio y solo video (pregrabado)", "nivel": "A", "rol": "Ambos", "metodo": "Revisión manual", "como": "Identifica si hay contenido de solo audio (podcast, grabación de voz sin imagen) o de solo vídeo sin audio (animación muda, demostración sin narración).\nComprueba si existe una alternativa equivalente:\n— Para audio: una transcripción textual completa.\n— Para vídeo sin audio: una audiodescripción o una transcripción que describa lo que ocurre visualmente.", "pasa": "Existe una alternativa textual completa o una audiodescripción que transmite la misma información que el contenido multimedia.", "falla": "No hay transcripción ni alternativa. O la alternativa existe pero está incompleta (omite partes del diálogo, efectos sonoros relevantes o información visual clave)."}, {"pauta": "1.2 Medios en el tiempo", "id": "1.2.2", "criterio": "Subtítulos (pregrabados)", "nivel": "A", "rol": "Ambos", "metodo": "Revisión manual", "como": "Reproduce cada vídeo que tenga audio (diálogo, narración, efectos sonoros relevantes).\nActiva los subtítulos disponibles en el reproductor.\nVerifica que los subtítulos:\n— Están sincronizados con el audio.\n— Incluyen el diálogo completo, los cambios de locutor y los efectos sonoros que aportan información.", "pasa": "Los subtítulos cubren todo el contenido sonoro relevante, están sincronizados y son precisos.", "falla": "No hay subtítulos. O los subtítulos están desincronizados, son generados automáticamente sin revisión (con errores graves) o no identifican quién habla cuando hay varios locutores."}, {"pauta": "1.2 Medios en el tiempo", "id": "1.2.3", "criterio": "Descripción de audio o alternativa (pregrabado)", "nivel": "A", "rol": "Ambos", "metodo": "Revisión manual", "como": "Identifica vídeos donde la imagen aporta información que el audio no describe (texto en pantalla, acciones sin narración, gráficos).\nComprueba si existe alguna de estas alternativas:\n— Una pista de audiodescripción (narración adicional que describe lo visual).\n— O una alternativa textual completa que incluya tanto el audio como lo visual.", "pasa": "Toda la información visual del vídeo está disponible mediante audiodescripción o alternativa textual equivalente.", "falla": "Hay información visual importante (texto en pantalla, acciones, gráficos) que no se describe en el audio ni en ninguna alternativa accesible."}, {"pauta": "1.2 Medios en el tiempo", "id": "1.2.4", "criterio": "Subtítulos (en vivo)", "nivel": "AA", "rol": "Ambos", "metodo": "Revisión manual", "como": "Verifica si el sitio ofrece transmisiones en directo con audio (webinars, eventos, streams).\nComprueba que hay subtítulos disponibles en tiempo real durante la emisión.\nLos subtítulos en vivo pueden generarse automáticamente, pero deben ser suficientemente precisos.", "pasa": "Las emisiones en directo con audio tienen subtítulos disponibles y razonablemente precisos durante la emisión.", "falla": "No hay subtítulos para contenido en vivo. O se ofrecen pero no están activos durante la emisión."}, {"pauta": "1.2 Medios en el tiempo", "id": "1.2.5", "criterio": "Descripción de audio (pregrabada)", "nivel": "AA", "rol": "Ambos", "metodo": "Revisión manual", "como": "Para vídeos con contenido visual que no se describe en la narración principal:\nComprueba si existe una pista de audiodescripción activable en el reproductor.\nActívala y reproduce el vídeo. Verifica que describe las acciones, los textos en pantalla y los cambios de escena relevantes.\nLa audiodescripción se añade en los silencios naturales del audio principal.", "pasa": "El vídeo tiene una pista de audiodescripción que describe la información visual no incluida en el audio principal. Se puede activar desde el reproductor.", "falla": "No hay pista de audiodescripción y el vídeo contiene información visual que no se puede entender solo con el audio."}], "📐 Contenido": [{"pauta": "2.2 Tiempo suficiente", "id": "2.2.1", "criterio": "Tiempo ajustable", "nivel": "A", "rol": "Desarrollo", "metodo": "Revisión manual", "como": "Identifica si hay partes de la interfaz con límite de tiempo: sesiones que caducan, formularios con temporizador visible, contenido que desaparece tras un tiempo.\nSi existen, comprueba que el usuario puede hacer al menos una de estas cosas antes de que expire el tiempo:\n— Desactivar el límite de tiempo completamente.\n— Aumentar el tiempo al menos 10 veces (por ejemplo, de 20 a 200 segundos).\n— Recibir un aviso con al menos 20 segundos de antelación y poder prolongar el tiempo.", "pasa": "El usuario tiene suficiente tiempo para completar la tarea, con opción de ampliar o desactivar el límite.", "falla": "Hay límites de tiempo que expiran sin aviso suficiente, sin posibilidad de ampliarlos o desactivarlos."}, {"pauta": "2.4 Navegable", "id": "2.4.5", "criterio": "Múltiples vías de acceso", "nivel": "AA", "rol": "Diseño", "metodo": "Revisión manual", "como": "Comprueba que para llegar a una página interna cualquiera existen al menos dos formas distintas de encontrarla.\nEjemplos de mecanismos válidos: menú de navegación principal, mapa del sitio (sitemap), buscador interno, breadcrumbs (migas de pan), enlaces relacionados en otras páginas, categorías.\nExcepción: las páginas que son el resultado de un proceso (confirmación de compra, resumen de pedido) no necesitan múltiples vías de acceso.", "pasa": "Existe más de un mecanismo para llegar a cualquier página del sitio (no aplica a páginas de proceso).", "falla": "Solo hay un camino posible para llegar a una página, por ejemplo, únicamente a través de un flujo lineal sin menú de navegación ni buscador."}, {"pauta": "3.2 Predecible", "id": "3.2.3", "criterio": "Navegación consistente", "nivel": "AA", "rol": "Diseño", "metodo": "Revisión manual", "como": "Navega por varias páginas del sitio (al menos 3-4 páginas representativas).\nObserva el bloque de navegación principal (menú, barra lateral, breadcrumbs) en cada página.\nComprueba que los elementos de navegación aparecen siempre en el mismo orden relativo.\nUn cambio de estado (resaltar la página activa en el menú) no se considera inconsistencia.", "pasa": "Los menús y bloques de navegación mantienen el mismo orden en todas las páginas del sitio.", "falla": "El menú reordena sus elementos, algunos ítems desaparecen o la barra de navegación aparece en posiciones diferentes según la página."}, {"pauta": "3.2 Predecible", "id": "3.2.4", "criterio": "Identificación consistente", "nivel": "AA", "rol": "Diseño", "metodo": "Revisión manual", "como": "Identifica componentes con la misma función que aparecen en varias páginas: el icono del carrito, el botón de búsqueda, el enlace al perfil de usuario, el selector de idioma.\nComprueba que en todas las páginas donde aparecen usan el mismo texto de etiqueta, el mismo icono y el mismo nombre accesible.\nLa consistencia en el nombre accesible se puede verificar inspeccionando el Accessibility Tree en DevTools.", "pasa": "Los componentes con la misma función tienen el mismo nombre, icono y etiqueta en todo el sitio.", "falla": "El mismo botón se llama \"Buscar\" en unas páginas y \"Encontrar\" en otras. O el mismo icono tiene diferentes nombres accesibles según la página."}, {"pauta": "3.2 Predecible", "id": "3.2.6", "criterio": "Ayuda consistente", "nivel": "A", "rol": "Diseño", "metodo": "Revisión manual", "como": "Identifica si la interfaz ofrece mecanismos de ayuda al usuario: chat en vivo, número de teléfono, formulario de contacto, enlace a la FAQ, dirección de email de soporte.\nSi alguno de estos mecanismos aparece en varias páginas, comprueba que está siempre en la misma posición relativa dentro de cada página donde aparece.", "pasa": "Los mecanismos de ayuda están en la misma ubicación relativa en todas las páginas donde están presentes.", "falla": "El botón de chat aparece abajo a la derecha en unas páginas y arriba a la izquierda en otras. O el enlace de contacto está en el footer en algunas páginas y en el header en otras."}], "👆 Puntero-Táctil": [{"pauta": "2.5 Modalidades de entrada", "id": "2.5.1", "criterio": "Gestos del puntero", "nivel": "A", "rol": "Desarrollo", "metodo": "Gestos / ratón", "como": "Identifica funciones que requieren gestos con trayectoria o multicontacto: arrastrar, hacer swipe, pellizcar para hacer zoom, rotar con dos dedos.\nPara cada una de estas funciones, comprueba que existe una forma alternativa de realizarla con un simple clic o tap sin necesidad de movimiento:\n— Un carrusel con swipe: ¿tiene también botones de siguiente/anterior?\n— Un mapa con pellizco: ¿tiene también botones de zoom +/–?\n— Una lista ordenable por drag: ¿tiene también flechas o un menú para subir/bajar?", "pasa": "Toda función que requiere un gesto complejo tiene una alternativa de un solo punto de contacto (un clic o tap).", "falla": "Hay funciones que solo pueden realizarse mediante gestos de múltiples dedos o movimientos con trayectoria, sin ninguna alternativa de tap simple."}, {"pauta": "2.5 Modalidades de entrada", "id": "2.5.2", "criterio": "Cancelación del puntero", "nivel": "A", "rol": "Desarrollo", "metodo": "Ratón / gestos", "como": "Busca controles que ejecutan una acción de consecuencias relevantes (borrar, confirmar, activar).\nPara cada uno, prueba qué ocurre si haces clic y antes de soltar el botón del ratón mueves el cursor fuera del control.\nEl objetivo es que las acciones no se disparen al presionar (mousedown/touchstart) sino al soltar (mouseup/touchend), y que si te arrepientes antes de soltar, puedes cancelar la acción.", "pasa": "Las acciones se completan al soltar el botón (mouseup/touchend). Si el cursor se mueve fuera del control antes de soltar, la acción no se ejecuta.", "falla": "Una acción importante se dispara en cuanto el usuario presiona el control, antes de que lo suelte, sin posibilidad de cancelar."}, {"pauta": "2.5 Modalidades de entrada", "id": "2.5.4", "criterio": "Actuación por movimiento", "nivel": "A", "rol": "Desarrollo", "metodo": "Revisión manual", "como": "Identifica si alguna función responde al movimiento físico del dispositivo: agitar el teléfono para deshacer, inclinar para desplazarse, mover el dispositivo para una acción.\nSi existen estas funciones, verifica:\n— Que hay un control alternativo en la pantalla que realiza la misma función.\n— Que la respuesta al movimiento puede desactivarse desde la configuración de la app o de accesibilidad del sistema.", "pasa": "Las funciones por movimiento tienen alternativa en pantalla y el usuario puede desactivar la respuesta al movimiento.", "falla": "Una función solo está disponible agitando o inclinando el dispositivo, sin alternativa en la interfaz, o no puede desactivarse."}, {"pauta": "2.5 Modalidades de entrada", "id": "2.5.7", "criterio": "Movimientos de arrastre", "nivel": "AA", "rol": "Desarrollo", "metodo": "Ratón / gestos", "como": "Identifica todas las funciones que requieren arrastrar un elemento de un lugar a otro: listas ordenables, sliders de rango doble, elementos de drag & drop, paneles redimensionables.\nPara cada una, comprueba que existe una alternativa que no requiere arrastre: botones para subir/bajar en una lista, inputs numéricos en un slider, menú de acciones alternativas.", "pasa": "Toda función que requiere arrastre tiene una alternativa equivalente que se puede usar con un simple clic o tap.", "falla": "Hay funciones que solo pueden realizarse arrastrando, sin ninguna alternativa accesible."}, {"pauta": "2.5 Modalidades de entrada", "id": "2.5.8", "criterio": "Tamaño del objetivo (mínimo)", "nivel": "AA", "rol": "Diseño", "metodo": "Medición en DevTools / Figma", "como": "Identifica controles interactivos pequeños: iconos clicables, checkboxes, radio buttons, botones de icono, paginación, botones de cierre en tags.\nMide el área de interacción (no el tamaño visual del icono, sino el área clicable real) en DevTools (clic derecho → Inspect → box model) o en Figma.\nEl área mínima es 24×24 píxeles CSS.\nExcepción: si el control tiene menos de 24×24px pero hay suficiente espacio libre alrededor hasta el siguiente control que suma el equivalente, también cumple.", "pasa": "El área de interacción de cada control es de al menos 24×24px CSS, o existe espacio compensatorio suficiente entre controles adyacentes.", "falla": "Botones de icono, checkboxes o controles de paginación tienen un área clicable menor de 24×24px sin espacio compensatorio."}]}, "herramientas": [{"name": "🌊  WAVE Evaluation Tool", "descripcion": "Escáner visual rápido de toda la página.\nTe muestra de golpe errores de estructura, alt texts, etiquetas de formulario, contraste y landmarks.", "tipo": "Extensión de navegador", "navegadores": "Chrome · Firefox · Edge", "gratuito": "Sí", "url": "https://wave.webaim.org/extension/", "criterios": "1.1.1, 1.3.1, 1.4.3, 2.4.1, 2.4.2, 2.4.4, 3.1.1, 3.3.1, 4.1.2", "instalacion": "1. Ve a wave.webaim.org/extension\n2. Clic en «Add to Chrome» (o Firefox) → acepta permisos.\n3. Icono de ola en la barra de extensiones.\n4. Fíjalo: icono puzzle → pin.", "uso": "1. Navega a la página a analizar.\n2. Clic en el icono de WAVE.\n3. La página se recarga con panel lateral y overlays.\n4. Pestañas del panel: Summary · Details · Reference · Structure · Contrast.\n5. Clic en cualquier icono de la página → detalle del elemento.\n6. «Styles off» → estructura sin CSS.\n7. Pestaña Contrast → slider para ajustar el umbral."}, {"name": "🗂  HeadingsMap", "descripcion": "Mapa visual de la jerarquía de encabezados (h1–h6) y landmarks.\nTe dice si la estructura del documento tiene sentido y si los niveles son correctos.", "tipo": "Extensión de navegador", "navegadores": "Chrome · Firefox", "gratuito": "Sí", "url": "https://chromewebstore.google.com/detail/headingsmap/flbjommegcjonpdmenkdiocclhjacmbi", "criterios": "1.3.1, 2.4.2, 2.4.6", "instalacion": "1. Busca «HeadingsMap» en Chrome Web Store o Firefox Add-ons.\n2. Clic en «Añadir» → acepta permisos.\n3. Icono H con niveles en la barra de extensiones.", "uso": "1. Navega a la página a analizar.\n2. Clic en el icono de HeadingsMap.\n3. Panel lateral con encabezados h1–h6 sangrados por nivel.\n4. Clic en cualquier encabezado del mapa → salta al elemento.\n5. Alterna entre «Headings» y «Sectioning» (landmarks HTML5)."}, {"name": "🔖  Bookmarklets a11y-tools.com", "descripcion": "Scripts de un clic para inspecciones específicas sin instalar nada.\nCada bookmarklet revela una capa concreta: foco, alts, spacing, landmarks o headings.", "tipo": "Bookmarklets", "navegadores": "Cualquier navegador de escritorio", "gratuito": "Sí", "url": "https://a11y-tools.com/bookmarklets/", "criterios": "1.1.1, 1.3.1, 1.4.11, 1.4.12, 2.4.7, 4.1.2", "instalacion": "1. Ve a a11y-tools.com/bookmarklets en tu navegador.\n2. Activa la barra de favoritos (Ctrl+Shift+B / Cmd+Shift+B).\n3. Arrastra cada enlace azul a la barra de favoritos.\n4. Recomendados: «Outline Focusable», «Show Images Alt»,\n   «Text Spacing», «Show Headings», «ARIA Landmarks».", "uso": "1. Navega a la página a inspeccionar.\n2. Clic en el bookmarklet desde la barra de favoritos.\n3. El script se inyecta al instante. F5 para desactivar.\n\n· Outline Focusable → resalta elementos que reciben foco.\n· Show Images Alt → muestra el valor del alt de cada imagen.\n· Text Spacing → aplica los estilos de espaciado de WCAG 1.4.12.\n· Show Headings → etiqueta cada heading con su nivel.\n· ARIA Landmarks → resalta y etiqueta los landmarks."}, {"name": "⌨  TabA11y — Tab Order", "descripcion": "Visualiza el orden real de tabulación con números superpuestos.\nTe dice si el flujo del teclado sigue la lógica visual o está roto.", "tipo": "Extensión de navegador", "navegadores": "Chrome · Edge", "gratuito": "Sí", "url": "https://chromewebstore.google.com/detail/taba11y-tab-order-accessi/aocppmckdocdjkphmofnklcjhdidgmga", "criterios": "1.3.2, 2.1.1, 2.4.3, 2.4.7", "instalacion": "1. Abre el enlace de Chrome Web Store (URL arriba).\n2. Clic en «Añadir a Chrome» → acepta permisos.\n3. Icono ⌨ con número en la barra de extensiones.\n4. Edge: disponible también desde Edge Add-ons.", "uso": "1. Navega a la página a analizar.\n2. Clic en el icono de TabA11y.\n3. Números superpuestos sobre todos los elementos focusables.\n4. Compara el orden numérico con el flujo visual esperado\n   (arriba→abajo, izquierda→derecha).\n5. Clic en el icono de nuevo para desactivar."}, {"name": "🎨  WCAG Color Contrast Checker", "descripcion": "Mide el ratio de contraste entre texto y fondo en toda la página o con cuentagotas manual.\nTe dice si supera los umbrales AA (4.5:1 / 3:1) con resultado PASS o FAIL.", "tipo": "Extensión de navegador", "navegadores": "Chrome · Edge", "gratuito": "Sí", "url": "https://chromewebstore.google.com/detail/plnahcmalebffmaghcpcmpaciebdhgdf", "criterios": "1.4.3, 1.4.6, 1.4.11", "instalacion": "1. Abre Chrome Web Store con el enlace de la URL arriba.\n2. Clic en «Añadir a Chrome» → acepta permisos.\n3. Icono de paleta de color en la barra de extensiones.\n4. Edge: disponible también desde Edge Add-ons.", "uso": "Modo automático:\n1. Navega a la página. Clic en el icono.\n2. Lista todos los textos con su ratio de contraste.\n3. Filtra por «Failures» para ver solo los que fallan.\n\nModo manual (cuentagotas):\n1. Selecciona color de texto con el cuentagotas.\n2. Selecciona color de fondo.\n3. Muestra el ratio y PASS/FAIL para AA y AAA."}, {"name": "💻  Navegación por teclado · Mac", "descripcion": "Verifica que toda la interfaz es operable sin ratón.\nComprueba que el foco es visible, el orden es lógico y no hay trampas de teclado.", "tipo": "Prueba manual", "navegadores": "Safari · Chrome · Firefox (macOS)", "gratuito": "Sí", "url": "Sin instalación", "criterios": "2.1.1, 2.1.2, 2.4.1, 2.4.3, 2.4.7, 2.4.11", "instalacion": "Safari — activar navegación por teclado completa:\nPreferencias del Sistema → Accesibilidad → Teclado\n→ activa «Acceso completo al teclado».\nO pulsa Ctrl+F7 para activarlo temporalmente.\n\nChrome / Firefox en Mac:\nNo requiere configuración adicional. Tab funciona directamente.", "uso": "Teclas principales:\n  Tab            → elemento interactivo siguiente\n  Shift+Tab      → elemento interactivo anterior\n  Enter          → activar enlace o botón\n  Espacio        → activar botón, marcar checkbox\n  Flechas ↑↓←→  → navegar dentro de componentes\n                   (menús, tabs, radios, sliders)\n  Escape         → cerrar modales o menús abiertos\n\nQué comprobar:\n1. Llegar a TODOS los controles interactivos con Tab.\n2. Que el foco sea visible en todo momento.\n3. Que no quedes atrapado en ningún componente.\n4. Que modales abran y cierren correctamente con Escape.\n5. Que el skip link aparezca en el primer Tab."}, {"name": "🪟  Navegación por teclado · Windows", "descripcion": "Verifica que toda la interfaz es operable sin ratón.\nComprueba que el foco es visible, el orden es lógico y no hay trampas de teclado.", "tipo": "Prueba manual", "navegadores": "Chrome · Firefox · Edge (Windows)", "gratuito": "Sí", "url": "Sin instalación", "criterios": "2.1.1, 2.1.2, 2.4.1, 2.4.3, 2.4.7, 2.4.11", "instalacion": "No requiere configuración.\nTab funciona en Chrome, Firefox y Edge directamente.\n\nRecomendado: desconectar o apartar el ratón durante\nla prueba para evitar usarlo inconscientemente.", "uso": "Teclas principales:\n  Tab            → elemento interactivo siguiente\n  Shift+Tab      → elemento interactivo anterior\n  Enter          → activar enlace o botón\n  Espacio        → activar botón, marcar checkbox\n  Flechas ↑↓←→  → navegar dentro de componentes\n                   (menús, tabs, radios, sliders)\n  Escape         → cerrar modales o menús abiertos\n  F6             → cambiar entre paneles del navegador\n\nQué comprobar:\n1. Llegar a TODOS los controles interactivos con Tab.\n2. Que el foco sea visible en todo momento.\n3. Que no quedes atrapado en ningún componente.\n4. Que modales abran y cierren con Escape.\n5. Que el skip link aparezca en el primer Tab."}, {"name": "🍎  VoiceOver · macOS", "descripcion": "Lector de pantalla nativo de Apple. Escucha cómo un usuario ciego experimenta la interfaz.\nRevela nombres accesibles, roles, estados y si la estructura tiene sentido auditivamente.", "tipo": "Lector de pantalla", "navegadores": "Safari (recomendado) · Chrome", "gratuito": "Sí (incluido en macOS)", "url": "Sin instalación (nativo en macOS)", "criterios": "1.1.1, 1.3.1, 1.3.2, 2.4.4, 2.4.6, 3.1.1, 3.3.1, 3.3.2, 4.1.2, 4.1.3", "instalacion": "Activar VoiceOver:\n  Cmd+F5  → activa/desactiva VoiceOver\n  O: Ajustes del Sistema → Accesibilidad → VoiceOver.\n\nPrimera vez: aparece el tutorial de VoiceOver.\nPuedes omitirlo con Escape o completarlo (recomendado).\n\nRecomendado: usar Safari para pruebas web con VoiceOver.\nLa integración Safari+VoiceOver es más completa que Chrome.", "uso": "Modificador VO = Ctrl+Option (mantener pulsado)\n\nNavegación básica:\n  VO+Flechas        → moverse por elementos\n  VO+Espacio        → activar el elemento enfocado\n  Tab               → siguiente elemento interactivo\n  Escape            → salir de un grupo o modal\n\nNavegación rápida por tipo:\n  VO+Cmd+H          → siguiente encabezado\n  VO+Cmd+L          → siguiente enlace\n  VO+Cmd+G          → siguiente imagen\n  VO+Cmd+J          → siguiente campo de formulario\n  VO+U              → Rotor (lista de encabezados,\n                      enlaces, landmarks, formularios)\n\nQué escuchar:\n· Que cada imagen tiene descripción significativa.\n· Que los botones anuncian su función.\n· Que los campos de formulario tienen etiqueta.\n· Que los estados cambian (expandido/contraído, marcado).\n· Que los mensajes de error se anuncian automáticamente."}, {"name": "📱  VoiceOver · iOS / iPadOS", "descripcion": "Lector de pantalla en iPhone/iPad. Replica la experiencia real de un usuario con discapacidad visual en móvil.\nImprescindible para auditorías de apps nativas y webs responsive.", "tipo": "Lector de pantalla", "navegadores": "Safari (iOS)", "gratuito": "Sí (incluido en iOS)", "url": "Sin instalación (nativo en iOS)", "criterios": "1.1.1, 1.3.1, 1.3.4, 2.4.4, 4.1.2, 4.1.3", "instalacion": "Activar VoiceOver en iPhone/iPad:\n  Opción A: triple clic en el botón lateral (si está configurado)\n  Opción B: Ajustes → Accesibilidad → VoiceOver → activar.\n\nConfigurar acceso rápido (recomendado):\n  Ajustes → Accesibilidad → Botón lateral (o inicio)\n  → selecciona VoiceOver.\n\n⚠ Con VoiceOver activo, los gestos cambian completamente.\n  Practicar antes de la primera auditoría.", "uso": "Gestos básicos:\n  Deslizar derecha        → siguiente elemento\n  Deslizar izquierda      → elemento anterior\n  Doble tap               → activar el elemento enfocado\n  Tres dedos arriba/abajo → desplazarse por la página\n  Deslizar arriba-izquierda → menú de acciones (rotor)\n\nRotor (girar dos dedos como un dial):\n  Ajusta el modo de navegación: encabezados, enlaces,\n  palabras, caracteres, landmarks…\n  Una vez configurado, desliza arriba/abajo para navegar\n  por ese tipo de elemento.\n\nQué escuchar:\n· Nombres accesibles en imágenes y botones de icono.\n· Etiquetas en campos de formulario.\n· Cambios de estado en toggles y checkboxes.\n· Anuncio de alertas y mensajes de error."}, {"name": "🤖  TalkBack · Android", "descripcion": "Lector de pantalla de Google para Android. Verifica la experiencia en el ecosistema más extendido de móviles.\nImprescindible para auditorías de apps Android y webs en Chrome móvil.", "tipo": "Lector de pantalla", "navegadores": "Chrome (Android)", "gratuito": "Sí (incluido en Android)", "url": "Sin instalación (nativo en Android)", "criterios": "1.1.1, 1.3.1, 1.3.4, 2.4.4, 4.1.2, 4.1.3", "instalacion": "Activar TalkBack:\n  Opción A: mantener pulsado Volumen+ y Volumen- 3 segundos\n            (si el acceso directo está activo).\n  Opción B: Ajustes → Accesibilidad → TalkBack → activar.\n\nActivar acceso directo:\n  Ajustes → Accesibilidad → Acceso directo de accesibilidad\n  → selecciona TalkBack.\n\n⚠ Con TalkBack activo, los gestos cambian completamente.\n  Practicar antes de la primera auditoría.", "uso": "Gestos básicos:\n  Deslizar derecha        → siguiente elemento\n  Deslizar izquierda      → elemento anterior\n  Doble tap               → activar el elemento enfocado\n  Deslizar arriba-derecha → menú de gestos global\n  Deslizar abajo-izquierda → volver atrás\n\nCon teclado Bluetooth (para pruebas web):\n  Tab / Shift+Tab → navegar entre elementos\n  Enter           → activar\n  Escape          → salir de modales\n\nNavegación por tipo:\n  Menú de TalkBack → «Encabezados», «Enlaces», «Controles»\n  para saltar directamente a ese tipo de elemento.\n\nQué escuchar:\n· Nombres en imágenes, botones de icono y elementos interactivos.\n· Etiquetas en campos de formulario.\n· Estados en checkboxes, toggles y elementos expandibles.\n· Anuncio automático de alertas y errores."}, {"name": "🖥  NVDA · Windows", "descripcion": "Lector de pantalla gratuito para Windows, el más usado en entornos web de escritorio.\nVerifica nombres accesibles, roles, estados, estructura y comportamiento con usuarios de PC.", "tipo": "Lector de pantalla", "navegadores": "Firefox (recomendado) · Chrome · Edge", "gratuito": "Sí (donación opcional)", "url": "https://www.nvaccess.org/download/", "criterios": "1.1.1, 1.3.1, 1.3.2, 2.4.4, 2.4.6, 3.1.1, 3.1.2, 3.3.1, 3.3.2, 4.1.2, 4.1.3", "instalacion": "1. Ve a nvaccess.org/download y descarga el instalador.\n2. Ejecuta el instalador y sigue los pasos (instalación estándar).\n3. Activar/desactivar NVDA: Ctrl+Alt+N\n   O desde el icono en la bandeja del sistema.\n\nRecomendado para pruebas web:\n  Usar Firefox. La integración NVDA+Firefox\n  es la más completa para auditorías WCAG.", "uso": "Modificador NVDA = Insert (mantener pulsado)\n\nModo exploración (browse mode) — para leer:\n  Flechas ↑↓         → leer línea a línea\n  Insert+Espacio     → alternar entre modo lectura y modo foco\n\nNavegación rápida por tipo (solo modo exploración):\n  H                  → siguiente encabezado\n  1–6                → encabezado de nivel 1–6\n  F                  → siguiente campo de formulario\n  B                  → siguiente botón\n  L                  → siguiente lista\n  T                  → siguiente tabla\n  K                  → siguiente enlace\n  Insert+F7          → lista de todos los enlaces\n\nModo foco (forms mode) — para interactuar:\n  Se activa automáticamente al llegar a un formulario.\n  Tab para moverse entre campos, Enter para enviar.\n\nQué escuchar:\n· Encabezados: «encabezado nivel 2, Título de sección».\n· Botones: «Enviar, botón».\n· Campos: «Nombre, campo de texto».\n· Estados: «casilla marcada», «expandido», «seleccionado».\n· Alertas: mensajes de error anunciados automáticamente."}]};
+
+const pageMap = {
+  home:'page-home', teclado:'page-teclado', visual:'page-visual', lector:'page-lector',
+  formularios:'page-formularios', multimedia:'page-multimedia', contenido:'page-contenido',
+  tactil:'page-tactil', herramientas:'page-herramientas', referencias:'page-referencias'
+};
+const navMap = {
+  home:'nav-home', teclado:'nav-teclado', visual:'nav-visual', lector:'nav-lector',
+  formularios:'nav-formularios', multimedia:'nav-multimedia', contenido:'nav-contenido',
+  tactil:'nav-tactil', herramientas:'nav-herramientas', referencias:'nav-referencias'
+};
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(n => { n.classList.remove('active'); n.removeAttribute('aria-current'); });
+  document.getElementById(pageMap[id])?.classList.add('active');
+  const nav = document.getElementById(navMap[id]);
+  if (nav) { nav.classList.add('active'); nav.setAttribute('aria-current','page'); }
+  document.getElementById('main-content').focus();
+  closeMobileNav(); window.scrollTo(0,0);
+}
+
+const menuToggle = document.getElementById('menu-toggle');
+const sidebar    = document.getElementById('sidebar');
+const overlay    = document.getElementById('nav-overlay');
+menuToggle.addEventListener('click', () => {
+  const open = sidebar.classList.contains('open');
+  if (open) closeMobileNav();
+  else {
+    sidebar.classList.add('open'); overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden','false');
+    menuToggle.setAttribute('aria-expanded','true');
+    menuToggle.textContent = '✕ Cerrar';
+  }
+});
+overlay.addEventListener('click', closeMobileNav);
+function closeMobileNav() {
+  sidebar.classList.remove('open'); overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden','true');
+  menuToggle.setAttribute('aria-expanded','false');
+  menuToggle.textContent = '☰ Menú';
+}
+
+const sectionConfig = [
+  {id:'teclado',    key:'🎹 Teclado',        label:'Teclado',            emoji:'🎹'},
+  {id:'visual',     key:'👁 Visual',          label:'Visual',             emoji:'👁'},
+  {id:'lector',     key:'🔊 Lector pantalla', label:'Lector de pantalla', emoji:'🔊'},
+  {id:'formularios',key:'📝 Formularios',     label:'Formularios',        emoji:'📝'},
+  {id:'multimedia', key:'🎥 Multimedia',      label:'Multimedia',         emoji:'🎥'},
+  {id:'contenido',  key:'📐 Contenido',       label:'Contenido',          emoji:'📐'},
+  {id:'tactil',     key:'👆 Puntero-Táctil',  label:'Puntero y Táctil',   emoji:'👆'}
+];
+
+const sectionDesc = {
+  teclado:     'Navegación completa sin ratón, foco visible y predecible, sin trampas de teclado y atajos seguros.',
+  visual:      'Contraste, zoom, reflow, espaciado de texto, uso del color y orientación de pantalla.',
+  lector:      'Nombres accesibles, estructura semántica, roles, estados, idioma y mensajes dinámicos.',
+  formularios: 'Etiquetas, mensajes de error, autocomplete, prevención de errores y autenticación accesible.',
+  multimedia:  'Subtítulos, transcripciones y audiodescripción en contenido de vídeo y audio.',
+  contenido:   'Consistencia de navegación, múltiples vías de acceso, tiempos ajustables y ayuda contextual.',
+  tactil:      'Gestos, arrastre, tamaño de objetivo táctil, cancelación y actuación por movimiento.'
+};
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function mkCard(item) {
+  const lvlCls = item.nivel === 'AA' ? 'badge-aa' : 'badge-a';
+  const safeId = esc(item.id).replace(/[.]/g,'-');
+  return `<details class="test-card" id="test-${safeId}">
+    <summary class="test-summary" aria-label="Criterio ${esc(item.id)}: ${esc(item.criterio)}. Nivel ${esc(item.nivel)}. Rol ${esc(item.rol)}">
+      <span class="test-id" aria-hidden="true">${esc(item.id)}</span>
+      <div class="test-title-group">
+        <div class="test-name">${esc(item.criterio)}</div>
+        <div class="test-pauta" aria-hidden="true">${esc(item.pauta)}</div>
+      </div>
+      <div class="test-meta" aria-hidden="true">
+        <span class="badge ${lvlCls}">${esc(item.nivel)}</span>
+        <span class="badge-rol">${esc(item.rol)}</span>
+      </div>
+      <span class="test-chevron" aria-hidden="true">▶</span>
+    </summary>
+    <div class="test-body" role="region" aria-label="Detalle ${esc(item.id)}">
+      <div class="test-method-bar">
+        <span class="method-label">Método:</span>
+        <span class="method-value">${esc(item.metodo)}</span>
+      </div>
+      <div class="test-sections">
+        ${item.como  ? `<div class="test-section-block"><div class="test-section-label label-como"><span class="label-icon" aria-hidden="true">📋</span>Cómo hacer la prueba</div><p class="test-text">${esc(item.como)}</p></div>`  : ''}
+        ${item.pasa  ? `<div class="test-section-block pasa-block"><div class="test-section-label label-pasa"><span class="label-icon" aria-hidden="true">✓</span>Pasa si…</div><p class="test-text">${esc(item.pasa)}</p></div>`   : ''}
+        ${item.falla ? `<div class="test-section-block falla-block"><div class="test-section-label label-falla"><span class="label-icon" aria-hidden="true">✗</span>Falla si…</div><p class="test-text">${esc(item.falla)}</p></div>` : ''}
+      </div>
+    </div>
+  </details>`;
+}
+
+function mkSection(cfg) {
+  const items = DATA.sections[cfg.key] || [];
+  return `<section class="page" id="page-${cfg.id}" aria-label="${cfg.label}">
+    <div class="page-header">
+      <p class="page-eyebrow">Metodología de prueba</p>
+      <h1>${cfg.emoji} ${cfg.label}</h1>
+      <p class="page-desc">${esc(sectionDesc[cfg.id] || '')}</p>
+    </div>
+    <div class="tests-list" role="list" aria-label="Criterios de ${cfg.label}">${items.map(mkCard).join('')}</div>
+  </section>`;
+}
+
+document.getElementById('section-pages').innerHTML = sectionConfig.map(mkSection).join('');
+
+const sectionCounts = {teclado:9,visual:12,lector:10,formularios:9,multimedia:5,contenido:5,tactil:5};
+document.getElementById('home-cards').innerHTML = sectionConfig.map(cfg => `
+  <div role="listitem">
+    <button class="home-section-card" onclick="showPage('${cfg.id}')" aria-label="${cfg.label}, ${sectionCounts[cfg.id]} pruebas">
+      <span class="hsc-emoji" aria-hidden="true">${cfg.emoji}</span>
+      <div class="hsc-name">${cfg.label}</div>
+      <div class="hsc-desc">${esc(sectionDesc[cfg.id] || '')}</div>
+      <div class="hsc-count" aria-hidden="true">${sectionCounts[cfg.id]} pruebas</div>
+    </button>
+  </div>`).join('');
+
+document.getElementById('tools-grid').innerHTML = DATA.herramientas.map((tool, idx) => {
+  const isUrl = tool.url?.startsWith('http');
+  const hasI  = tool.instalacion?.length > 5;
+  const hasU  = tool.uso?.length > 10;
+  return `<article class="tool-card" role="listitem" aria-label="${esc(tool.name)}">
+    <div class="tool-header">
+      <h3 class="tool-name">${esc(tool.name)}</h3>
+      <div class="tool-type-row">
+        <span class="tool-type-badge">${esc(tool.tipo)}</span>
+        ${tool.gratuito === 'Sí' ? '<span class="tool-free" aria-label="Gratuita">Gratuita</span>' : ''}
+      </div>
+    </div>
+    <div class="tool-body">
+      <p class="tool-desc">${esc(tool.descripcion)}</p>
+      ${tool.navegadores ? `<p class="tool-nav-row"><strong>Navegadores:</strong> ${esc(tool.navegadores)}</p>` : ''}
+      ${isUrl ? `<a href="${esc(tool.url)}" class="tool-link" target="_blank" rel="noopener noreferrer" aria-label="${esc(tool.name)} (nueva pestaña)">↗ ${esc(tool.url)}</a>` : (tool.url && tool.url !== 'nan' && tool.url !== 'Sin instalación' ? `<p class="tool-nav-row"><strong>Acceso:</strong> ${esc(tool.url)}</p>` : '')}
+      ${tool.criterios ? `<p class="tool-criterios" aria-label="Criterios WCAG relacionados">Criterios: ${esc(tool.criterios)}</p>` : ''}
+    </div>
+    ${(hasI || hasU) ? `
+    <button class="tool-details-toggle" onclick="td(${idx})" aria-expanded="false" aria-controls="td-${idx}" id="tt-${idx}">
+      <span aria-hidden="true">▸</span> Ver instalación y uso
+    </button>
+    <div class="tool-details-content" id="td-${idx}" role="region" aria-labelledby="tt-${idx}">
+      ${hasI ? `<div class="tool-detail-section"><p class="tool-detail-label">Instalación</p><p class="tool-detail-text">${esc(tool.instalacion)}</p></div>` : ''}
+      ${hasU ? `<div class="tool-detail-section"><p class="tool-detail-label">Cómo usar</p><p class="tool-detail-text">${esc(tool.uso)}</p></div>` : ''}
+    </div>` : ''}
+  </article>`;
+}).join('');
+
+function td(idx) {
+  const c = document.getElementById(`td-${idx}`);
+  const t = document.getElementById(`tt-${idx}`);
+  const open = c.classList.toggle('open');
+  t.setAttribute('aria-expanded', String(open));
+  t.innerHTML = open
+    ? '<span aria-hidden="true">▾</span> Ocultar instalación y uso'
+    : '<span aria-hidden="true">▸</span> Ver instalación y uso';
+}
+</script>
+</body>
+</html>
