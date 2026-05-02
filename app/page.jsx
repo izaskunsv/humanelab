@@ -233,8 +233,8 @@ export default function HumaneToolkitHome() {
         <aside style={s.sidebar} aria-label={lang === "es" ? "Navegación del sitio" : "Site navigation"}>
           <div style={s.logoWrap}>
   <img src="/logo_humane_lab.png" alt="" aria-hidden="true" style={s.logoImg} />
-  <span style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: "#1A1A18", letterSpacing: "-0.01em" }} aria-label="Humane Lab">
-  <em style={{ fontStyle: "italic", color: "#1A1A18" }}>Humane</em> lab
+  <span style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: "#1A1A18", letterSpacing: "-0.01em", display: "inline-block" }} aria-label="Humane Lab">
+  <em style={{ fontStyle: "italic", color: "#1A1A18", fontWeight: 700 }}>Humane</em> lab
 </span>
 </div>
           <nav aria-label={lang === "es" ? "Secciones principales" : "Main sections"} style={{ flex: 1 }}>
