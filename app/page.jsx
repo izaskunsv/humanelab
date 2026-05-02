@@ -331,21 +331,101 @@ export default function HumaneToolkitHome() {
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-          .humane-page { flex-direction: column !important; }
-          .humane-sidebar {
-            width: 100% !important;
-            min-width: unset !important;
-            border-right: none !important;
-            border-bottom: 1.5px solid #C8C6BC !important;
-            padding: 16px !important;
-          }
-          .humane-main-wrap { width: 100% !important; }
-          .humane-main { padding: 20px 16px !important; }
-          .humane-grid { grid-template-columns: 1fr !important; }
-          .humane-hero h1 { font-size: 26px !important; }
-          .humane-breadcrumb { padding: 12px 16px !important; }
-        }
+       @media (max-width: 768px) {
+  /* Layout principal — columna en móvil */
+  div[style*="display: flex"][style*="min-height: 100vh"] {
+    flex-direction: column !important;
+  }
+  
+  /* Sidebar — pasa a horizontal arriba */
+  aside {
+    width: 100% !important;
+    min-width: unset !important;
+    border-right: none !important;
+    border-bottom: 1.5px solid #C8C6BC !important;
+    padding: 16px !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  /* Logo en móvil */
+  aside > div:first-child {
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Navegación en móvil — horizontal */
+  aside nav {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+
+  /* Ocultar labels de sección en móvil */
+  aside nav p {
+    display: none !important;
+  }
+
+  /* Nav items en móvil — compactos */
+  aside nav ul {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    margin: 0 !important;
+  }
+
+  aside nav button {
+    font-size: 14px !important;
+    padding: 6px 10px !important;
+    border-radius: 20px !important;
+    border: 1.5px solid #C8C6BC !important;
+    background: #F5F4F0 !important;
+  }
+
+  aside nav button[aria-current="page"],
+  aside nav button[aria-pressed="true"] {
+    background: #1A1A18 !important;
+    color: #FFFFFF !important;
+    border-color: #1A1A18 !important;
+  }
+
+  /* Ocultar lang toggle en móvil */
+  aside > button:last-child {
+    display: none !important;
+  }
+
+  /* Breadcrumb */
+  nav[aria-label="Ruta de navegación"],
+  nav[aria-label="Breadcrumb"] {
+    padding: 10px 16px !important;
+  }
+
+  /* Main content */
+  main {
+    padding: 24px 16px !important;
+  }
+
+  /* Hero title */
+  main h1 {
+    font-size: 26px !important;
+  }
+
+  /* Hero desc */
+  main p {
+    font-size: 16px !important;
+  }
+
+  /* Tool grid — una columna */
+  ul[aria-label="Lista de herramientas"],
+  ul[aria-label="Tools list"] {
+    grid-template-columns: 1fr !important;
+  }
+}
       `}</style>
     </>
   );
