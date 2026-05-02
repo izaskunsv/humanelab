@@ -233,7 +233,9 @@ export default function HumaneToolkitHome() {
         <aside style={s.sidebar} aria-label={lang === "es" ? "Navegación del sitio" : "Site navigation"}>
           <<div style={s.logoWrap}>
   <img src="/logo_humane_lab.png" alt="" aria-hidden="true" style={s.logoImg} />
-  <span style={s.logoText} aria-label="Humane Lab"><em>Humane</em><br />lab</span>
+  <span style={s.logoText} aria-label="Humane Lab">
+  <em style={{ fontStyle: "italic" }}>Humane</em>{" lab"}
+</span>
 </div>
           <nav aria-label={lang === "es" ? "Secciones principales" : "Main sections"} style={{ flex: 1 }}>
             <NavLinks />
