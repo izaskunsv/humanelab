@@ -140,7 +140,6 @@ export default function HumaneToolkitHome() {
                     style={Object.assign({}, s.navItem, isActiveNav(item) ? s.navItemActive : {})}
                     onClick={() => { setActiveFilter(item.id); setActiveSection(SECTIONS.tools); }}
                     aria-current={isActiveNav(item) ? "page" : undefined}
-                    aria-pressed={isActiveNav(item)}
                   >
                     {item.id !== "all" && TAG_META[item.id] && (
                       <span style={Object.assign({}, s.navDot, { background: TAG_META[item.id].color })} aria-hidden="true" />
@@ -160,7 +159,6 @@ export default function HumaneToolkitHome() {
                   style={Object.assign({}, s.navItem, activeSection === SECTIONS.about ? s.navItemActive : {})}
                   onClick={() => { setActiveSection(SECTIONS.about); setActiveFilter("all"); }}
                   aria-current={activeSection === SECTIONS.about ? "page" : undefined}
-                  aria-pressed={activeSection === SECTIONS.about}
                 >
                   {t.nav.about}
                 </button>
@@ -170,7 +168,6 @@ export default function HumaneToolkitHome() {
                   style={Object.assign({}, s.navItem, activeSection === SECTIONS.changelog ? s.navItemActive : {})}
                   onClick={() => { setActiveSection(SECTIONS.changelog); setActiveFilter("all"); }}
                   aria-current={activeSection === SECTIONS.changelog ? "page" : undefined}
-                  aria-pressed={activeSection === SECTIONS.changelog}
                 >
                   {t.nav.changelog}
                 </button>
@@ -229,7 +226,7 @@ export default function HumaneToolkitHome() {
                   </h1>
                 )}
                 {filteredTools.length > 0 ? (
-                  <ul style={s.toolGrid} role="list" aria-label={lang === "es" ? "Lista de herramientas" : "Tools list"}>
+                  <ul style={s.toolGrid} role="list" aria-label={lang === "es" ? "Herramientas disponibles" : "Available tools"}>
                     {filteredTools.map((tool) => (
                       <ToolCard key={tool.id} tool={tool} lang={lang} t={t} />
                     ))}
