@@ -284,20 +284,14 @@ export default function HumaneToolkitHome() {
           </main>
         </div>
       </div>
-      <footer style={s.footer} role="contentinfo">
-        <p style={s.footerText}>
-          Hecho por{" "}
-          
-            href="https://www.linkedin.com/in/izaskunsaez/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={s.footerLink}
-            aria-label="Izaskun Sáez en LinkedIn (se abre en nueva pestaña)"
-          >
-            Izaskun Sáez
-          </a>
-        </p>
-      </footer>
+     <footer style={s.footer} role="contentinfo">
+  <p style={s.footerText}>
+    {"Hecho por "}
+    <a href="https://www.linkedin.com/in/izaskunsaez/" target="_blank" rel="noopener noreferrer" style={s.footerLink}>
+      Izaskun Saez
+    </a>
+  </p>
+</footer>
 
       <style>{`
         a[href="#main-content"]:focus { top: 8px !important; outline: 3px solid #1A1A18; outline-offset: 2px; }
