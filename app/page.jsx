@@ -284,6 +284,20 @@ export default function HumaneToolkitHome() {
           </main>
         </div>
       </div>
+      <footer style={s.footer} role="contentinfo">
+        <p style={s.footerText}>
+          Hecho por{" "}
+          
+            href="https://www.linkedin.com/in/izaskunsaez/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={s.footerLink}
+            aria-label="Izaskun Sáez en LinkedIn (se abre en nueva pestaña)"
+          >
+            Izaskun Sáez
+          </a>
+        </p>
+      </footer>
 
       <style>{`
         a[href="#main-content"]:focus { top: 8px !important; outline: 3px solid #1A1A18; outline-offset: 2px; }
@@ -301,6 +315,7 @@ export default function HumaneToolkitHome() {
           .humane-breadcrumb { padding: 12px 16px !important; }
         }
       `}</style>
+      
     </>
   );
 }
@@ -396,4 +411,7 @@ const s = {
   changeEntry: { display: "flex", gap: 20, padding: "16px 0", borderBottom: "1.5px solid #C8C6BC", alignItems: "baseline" },
   changeDate: { fontSize: 14, color: "#5A5855", minWidth: 70, fontWeight: 700, flexShrink: 0 },
   changeText: { fontSize: 16, color: "#3A3A38", lineHeight: 1.6 },
+  footer: { padding: "24px 48px", borderTop: "1.5px solid #C8C6BC", background: "#FFFFFF", marginTop: "auto" },
+footerText: { fontSize: 14, color: "#5A5855", margin: 0 },
+footerLink: { color: "#0D5C9E", fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 3 },
 };
