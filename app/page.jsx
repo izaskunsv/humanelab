@@ -231,7 +231,7 @@ export default function HumaneToolkitHome() {
 
         {/* Sidebar desktop — oculto en móvil via CSS */}
         <aside style={s.sidebar} aria-label={lang === "es" ? "Navegación del sitio" : "Site navigation"}>
-          <<div style={s.logoWrap}>
+          <div style={s.logoWrap}>
   <img src="/logo_humane_lab.png" alt="" aria-hidden="true" style={s.logoImg} />
   <span style={s.logoText} aria-label="Humane Lab">
   <em style={{ fontStyle: "italic" }}>Humane</em> lab
