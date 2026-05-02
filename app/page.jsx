@@ -57,7 +57,7 @@ const TOOLS = [
     desc: { es: "Convierte textos complejos en lenguaje claro para cualquier audiencia.", en: "Converts complex text into plain language for any audience." },
     tags: ["a11y", "ux"],
     status: "live",
-    url: "#plain-language",
+    url: "/plain-language",
   },
   {
     id: "dark-pattern",
