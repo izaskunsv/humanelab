@@ -17,6 +17,7 @@ const i18n = {
     },
     about: {
       title: "Sobre esto",
+      definition: "humane lab /hjuːˈmeɪn læb/\nDe humane (latín humanus): compasivo, que actúa con consideración hacia los demás, que evita causar daño. Y lab, abreviatura de laboratory: espacio donde se experimenta, se prueba y se aprende.\nUn laboratorio que pone a las personas en el centro.",
       body: "¡Hola!, me llamo Izaskun y soy Product Designer con foco en accesibilidad y experiencia de usuario. He creado Humane Lab para probar cosas, aprender y compartir — explorando cómo el diseño puede ser más justo, claro y útil para todas las personas. Y ya de paso, me peleo con la IA y el vibe coding.",
       built: "Disciplinas",
       linkedinLabel: "Izaskun Sáez en LinkedIn",
@@ -41,6 +42,7 @@ const i18n = {
     hero: {
       eyebrow: "Tools laboratory",
       title: "More humane design, one utility at a time.",
+      definition: "humane lab /hjuːˈmeɪn læb/\nFrom humane (Latin humanus): compassionate, acting with consideration for others, avoiding harm. And lab, short for laboratory: a space to experiment, test and learn.\nA lab that puts people at the centre.",
       desc: "A collection of small tools built at the intersection of accessibility, behavioural economics and UX. Free, open, and iterated in public.",
     },
     tools: {
@@ -290,6 +292,13 @@ export default function HumaneToolkitHome() {
             {activeSection === SECTIONS.about && (
               <article style={s.prose} aria-labelledby="about-heading">
                 <h1 id="about-heading" style={s.proseTitle}>{t.about.title}</h1>
+                <blockquote style={s.definition}>
+  {t.about.definition.split("\n").map((line, i) => (
+    <p key={i} style={i === 0 ? s.definitionTitle : i === 2 ? s.definitionTagline : s.definitionBody}>
+      {line}
+    </p>
+  ))}
+</blockquote>
                 <p style={s.proseBody}>{t.about.body}</p>
                 <a href={t.about.linkedinUrl} target="_blank" rel="noopener noreferrer" style={s.linkedinLink} aria-label={t.about.linkedinLabel}>
                   <span aria-hidden="true" style={s.linkedinIcon}>in</span>
@@ -483,4 +492,8 @@ const s = {
   footer: { padding: "20px 48px", borderTop: "1.5px solid #C8C6BC", background: "#FFFFFF" },
   footerText: { fontSize: 14, color: "#5A5855", margin: 0 },
   footerLink: { color: "#0D5C9E", fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 3 },
+  definition: { borderLeft: "3px solid #1A1A18", paddingLeft: 20, margin: "0 0 28px", display: "flex", flexDirection: "column", gap: 6 },
+definitionTitle: { fontSize: 18, fontWeight: 700, color: "#1A1A18", margin: 0, fontFamily: "monospace" },
+definitionBody: { fontSize: 16, color: "#3A3A38", lineHeight: 1.7, margin: 0 },
+definitionTagline: { fontSize: 16, fontWeight: 700, color: "#1A1A18", margin: 0 },
 };
