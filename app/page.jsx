@@ -16,10 +16,12 @@ const i18n = {
       heading: "Herramientas",
     },
     about: {
-      title: "Por qué existe esto",
-      body: "La accesibilidad, la behavioral economics y el UX comparten un objetivo: reducir la distancia entre las personas y lo que necesitan hacer. Este laboratorio es un espacio para explorar esa intersección con herramientas concretas, compartibles y útiles.",
-      built: "Disciplinas",
-    },
+  title: "Sobre esto",
+  body: "Diseñadora con foco en accesibilidad y experiencia de usuario. Construyo Humane Lab para probar cosas, aprender y compartir — explorando cómo el diseño puede ser más justo, claro y útil para todas las personas. Por el camino, me estoy adentrando en la IA y el vibe coding.",
+  built: "Disciplinas",
+  linkedinLabel: "Izaskun Sáez en LinkedIn",
+  linkedinUrl: "https://www.linkedin.com/in/izaskunsaez/",
+},
     changelog: {
       title: "Novedades",
       entries: [
@@ -45,10 +47,12 @@ const i18n = {
       heading: "Tools",
     },
     about: {
-      title: "Why this exists",
-      body: "Accessibility, behavioural economics and UX share one goal: reducing the distance between people and what they need to do. This lab is a space to explore that intersection with concrete, shareable, useful tools.",
-      built: "Disciplines",
-    },
+  title: "About",
+  body: "Designer focused on accessibility and user experience. I build Humane Lab to try things, learn and share — exploring how design can be fairer, clearer and more useful for everyone. Along the way, I'm diving into AI and vibe coding.",
+  built: "Disciplines",
+  linkedinLabel: "Izaskun Sáez on LinkedIn",
+  linkedinUrl: "https://www.linkedin.com/in/izaskunsaez/",
+},
     changelog: {
       title: "Changelog",
       entries: [
@@ -256,23 +260,34 @@ export default function HumaneToolkitHome() {
 
             {/* ABOUT */}
             {activeSection === SECTIONS.about && (
-              <article style={s.prose} aria-labelledby="about-heading">
-                <h1 id="about-heading" style={s.proseTitle}>{t.about.title}</h1>
-                <p style={s.proseBody}>{t.about.body}</p>
-                <div style={s.builtBy}>
-                  <p style={s.builtByLabel}>{t.about.built}</p>
-                  <ul style={s.tagGrid} role="list">
-                    {Object.entries(TAG_META).map(([key, meta]) => (
-                      <li key={key} style={{ listStyle: "none" }}>
-                        <span style={{ ...s.tagPill, background: meta.bg, color: meta.text }}>
-                          {meta.label[lang]}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </article>
-            )}
+              {activeSection === SECTIONS.about && (
+  <article style={s.prose} aria-labelledby="about-heading">
+    <h1 id="about-heading" style={s.proseTitle}>{t.about.title}</h1>
+    <p style={s.proseBody}>{t.about.body}</p>
+    
+      href={t.about.linkedinUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={s.linkedinLink}
+      aria-label={t.about.linkedinLabel}
+    >
+      <span aria-hidden="true" style={s.linkedinIcon}>in</span>
+      {t.about.linkedinLabel}
+    </a>
+    <div style={{ ...s.builtBy, marginTop: 32 }}>
+      <p style={s.builtByLabel}>{t.about.built}</p>
+      <ul style={s.tagGrid} role="list">
+        {Object.entries(TAG_META).map(([key, meta]) => (
+          <li key={key} style={{ listStyle: "none" }}>
+            <span style={{ ...s.tagPill, background: meta.bg, color: meta.text }}>
+              {meta.label[lang]}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </article>
+)}
 
             {/* CHANGELOG */}
             {activeSection === SECTIONS.changelog && (
@@ -605,4 +620,16 @@ const s = {
   changeEntry: { display: "flex", gap: 20, padding: "16px 0", borderBottom: "1.5px solid #C8C6BC", alignItems: "baseline" },
   changeDate: { fontSize: 14, color: "#5A5855", minWidth: 70, fontWeight: 700, flexShrink: 0 },
   changeText: { fontSize: 16, color: "#3A3A38", lineHeight: 1.6 },
+  linkedinLink: {
+  display: "inline-flex", alignItems: "center", gap: 8,
+  fontSize: 16, fontWeight: 700, color: "#0D5C9E",
+  textDecoration: "underline", textUnderlineOffset: 3,
+  marginTop: 16,
+},
+linkedinIcon: {
+  display: "inline-flex", alignItems: "center", justifyContent: "center",
+  width: 24, height: 24, borderRadius: 4,
+  background: "#0D5C9E", color: "#FFFFFF",
+  fontSize: 13, fontWeight: 700,
+},
 };
