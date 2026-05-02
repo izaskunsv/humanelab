@@ -70,7 +70,7 @@
   .skip-link:focus { top: 8px; outline: 3px solid var(--accent); outline-offset: 2px; }
 
   header {
-    position: fixed; top: 0; left: 0; right: 0;
+    position: fixed; top: 60px; left: 0; right: 0;
     height: var(--header-h);
     background: var(--surface);
     border-bottom: 1px solid var(--border);
@@ -99,10 +99,9 @@
   }
   .menu-toggle:focus-visible { outline: 2px solid var(--level-a); outline-offset: 2px; }
 
-  .layout { display: flex; margin-top: var(--header-h); min-height: calc(100vh - var(--header-h)); }
-
+  .layout { display: flex; margin-top: calc(var(--header-h) + 56px);
   nav[aria-label="Secciones"] {
-    position: fixed; top: var(--header-h); left: 0;
+    position: fixed; top: calc(var(--header-h) + 56px); left: 0;
     width: var(--sidebar-w); height: calc(100vh - var(--header-h));
     background: var(--surface); border-right: 1px solid var(--border);
     overflow-y: auto; padding: 20px 0; z-index: 90;
