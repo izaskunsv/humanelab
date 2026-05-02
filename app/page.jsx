@@ -233,8 +233,8 @@ export default function HumaneToolkitHome() {
         <aside style={s.sidebar} aria-label={lang === "es" ? "Navegación del sitio" : "Site navigation"}>
           <div style={s.logoWrap}>
   <img src="/logo_humane_lab.png" alt="" aria-hidden="true" style={s.logoImg} />
-  <span style={s.logoText} aria-label="Humane Lab">
-  <em style={{ fontStyle: "italic" }}>Humane</em> lab
+  <span style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: "#1A1A18", letterSpacing: "-0.01em" }} aria-label="Humane Lab">
+  <em style={{ fontStyle: "italic", color: "#1A1A18" }}>Humane</em> lab
 </span>
 </div>
           <nav aria-label={lang === "es" ? "Secciones principales" : "Main sections"} style={{ flex: 1 }}>
@@ -454,7 +454,7 @@ const s = {
   sidebar: { width: 240, minWidth: 240, background: "#FFFFFF", borderRight: "1.5px solid #C8C6BC", padding: "28px 20px", display: "flex", flexDirection: "column" },
   logoWrap: { display: "flex", alignItems: "center", gap: 10, marginBottom: 32 },
   logoImg: { width: 32, height: 32, borderRadius: "50%", flexShrink: 0, objectFit: "cover" },
-  logoText: { fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: "#1A1A18", letterSpacing: "-0.01em", fontStyle: "normal" },
+  logoText: { fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: "#1A1A18", letterSpacing: "-0.01em" },
   navList: { listStyle: "none", padding: 0, margin: "0 0 4px" },
   navSection: { fontSize: 11, fontWeight: 700, color: "#5A5855", textTransform: "uppercase", letterSpacing: "0.07em", padding: "0 8px", margin: "0 0 4px" },
   navItem: { display: "flex", alignItems: "center", gap: 8, fontSize: 16, color: "#2A2A28", background: "none", border: "none", padding: "8px 10px", borderRadius: 6, cursor: "pointer", textAlign: "left", fontFamily: "inherit", width: "100%", marginBottom: 2, fontWeight: 400 },
