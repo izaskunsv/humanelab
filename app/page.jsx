@@ -197,7 +197,7 @@ export default function HumaneToolkitHome() {
 
       {/* Mobile top bar — solo visible en móvil via CSS */}
       <header style={s.mobileBar} aria-label="Humane Lab">
-        <span style={s.mobileLogoText}>Humane lab</span>
+        <span style={s.mobileLogoText} aria-label="Humane Lab"><em>Humane</em> lab</span>
         <button
           style={s.burgerBtn}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -226,9 +226,9 @@ export default function HumaneToolkitHome() {
         {/* Sidebar desktop — oculto en móvil via CSS */}
         <aside style={s.sidebar} aria-label={lang === "es" ? "Navegación del sitio" : "Site navigation"}>
           <div style={s.logoWrap}>
-            <span style={s.logoMark} aria-hidden="true" />
-            <span style={s.logoText} aria-label="Humane Lab">Humane<br />lab</span>
-          </div>
+  <img src="/logo_humane_lab.png" alt="" aria-hidden="true" style={s.logoImg} />
+  <span style={s.logoText} aria-label="Humane Lab"><em>Humane</em><br />lab</span>
+</div>
           <nav aria-label={lang === "es" ? "Secciones principales" : "Main sections"} style={{ flex: 1 }}>
             <NavLinks />
           </nav>
@@ -445,8 +445,8 @@ const s = {
   page: { display: "flex", minHeight: "100vh", fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif", background: "#F5F4F0", color: "#1A1A18" },
   sidebar: { width: 240, minWidth: 240, background: "#FFFFFF", borderRight: "1.5px solid #C8C6BC", padding: "28px 20px", display: "flex", flexDirection: "column" },
   logoWrap: { display: "flex", alignItems: "center", gap: 10, marginBottom: 32 },
-  logoMark: { display: "block", width: 28, height: 28, borderRadius: "50%", background: "#1A1A18", flexShrink: 0 },
-  logoText: { fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: "#1A1A18", letterSpacing: "-0.01em" },
+  logoImg: { width: 32, height: 32, borderRadius: "50%", flexShrink: 0 },
+  logoText: { fontSize: 16, fontWeight: 700, lineHeight: 1.3, color: "#1A1A18", letterSpacing: "-0.01em", fontStyle: "normal" },
   navList: { listStyle: "none", padding: 0, margin: "0 0 4px" },
   navSection: { fontSize: 11, fontWeight: 700, color: "#5A5855", textTransform: "uppercase", letterSpacing: "0.07em", padding: "0 8px", margin: "0 0 4px" },
   navItem: { display: "flex", alignItems: "center", gap: 8, fontSize: 16, color: "#2A2A28", background: "none", border: "none", padding: "8px 10px", borderRadius: 6, cursor: "pointer", textAlign: "left", fontFamily: "inherit", width: "100%", marginBottom: 2, fontWeight: 400 },
