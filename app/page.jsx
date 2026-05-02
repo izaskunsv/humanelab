@@ -274,7 +274,7 @@ export default function HumaneToolkitHome() {
       <span aria-hidden="true" style={s.linkedinIcon}>in</span>
       {t.about.linkedinLabel}
     </a>
-    <div style={{ ...s.builtBy, marginTop: 32 }}>
+    <div style={s.builtByWithMargin}>
       <p style={s.builtByLabel}>{t.about.built}</p>
       <ul style={s.tagGrid} role="list">
         {Object.entries(TAG_META).map(([key, meta]) => (
@@ -631,5 +631,6 @@ linkedinIcon: {
   width: 24, height: 24, borderRadius: 4,
   background: "#0D5C9E", color: "#FFFFFF",
   fontSize: 13, fontWeight: 700,
+  builtByWithMargin: { display: "flex", flexDirection: "column", gap: 10, marginTop: 32 },
 },
 };
